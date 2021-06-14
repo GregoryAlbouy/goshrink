@@ -7,14 +7,14 @@ import (
 
 // Avatar represents an user's avatar in the application.
 type Avatar struct {
-	ID     uint   `json:"id"`
-	UserID uint   `json:"user_id"`
+	ID     int    `json:"id"`
+	UserID int    `json:"user_id"`
 	Url    string `json:"url"`
 }
 
 // AvatarService represents a service for managing users avatars.
 type AvatarService interface {
-	FindByUserID(id uint) (*Avatar, error)
+	FindByUserID(id int) (*Avatar, error)
 
 	CreateOne(url string) error
 

@@ -2,7 +2,7 @@ package internal
 
 // User represents a user in the application.
 type User struct {
-	ID        uint   `json:"id"`
+	ID        int    `json:"id"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Password  string `json:"-"`
@@ -11,7 +11,7 @@ type User struct {
 
 // UserService represents a service for managing users.
 type UserService interface {
-	FindByID(id uint) (*User, error)
+	FindByID(id int) (*User, error)
 
 	CreateOne(u *User) error
 
