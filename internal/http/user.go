@@ -13,7 +13,7 @@ func (s *Server) registerUserRoutes(r *mux.Router) {
 
 	r.HandleFunc("/users", s.handleUserCreate).Methods("POST")
 
-	r.HandleFunc("/users/{id:[0-9]+}/avatar", authenticateAPIKey(s.handleUserAvatarUpdate)).Methods("PATCH")
+	r.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleUserAvatarUpdate).Methods("PATCH")
 }
 
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
