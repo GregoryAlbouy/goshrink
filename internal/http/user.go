@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// registerDialRoutes is a helper function for registering all user routes.
+// registerUserRoutes is a helper function for registering all user routes.
 func (s *Server) registerUserRoutes(r *mux.Router) {
 	r.HandleFunc("/users/{id:[0-9]+}", s.handleUserGet).Methods("GET")
 

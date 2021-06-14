@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// registerDialRoutes is a helper function for registering all avatar routes.
+// registerAvatarRoutes is a helper function for registering all avatar routes.
 func (s *Server) registerAvatarRoutes(r *mux.Router) {
 	r.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarGet).Methods("GET")
 
