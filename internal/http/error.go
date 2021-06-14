@@ -16,7 +16,7 @@ var (
 type HTTPError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
-	wrapped error  `json:"-"` // wrapped is used internally to share the error context.
+	wrapped error  // wrapped is used internally to share the error context.
 }
 
 func (e *HTTPError) Error() string {
