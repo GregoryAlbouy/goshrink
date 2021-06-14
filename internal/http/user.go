@@ -12,8 +12,6 @@ func (s *Server) registerUserRoutes(r *mux.Router) {
 	r.HandleFunc("/users/{id:[0-9]+}", s.handleUserGet).Methods("GET")
 
 	r.HandleFunc("/users", s.handleUserCreate).Methods("POST")
-
-	r.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleUserAvatarUpdate).Methods("PATCH")
 }
 
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
@@ -28,8 +26,4 @@ func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, 201, "Created")
-}
-
-func (s *Server) handleUserAvatarUpdate(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, 204, nil)
 }

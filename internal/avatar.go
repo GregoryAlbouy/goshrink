@@ -14,6 +14,8 @@ type Avatar struct {
 
 // AvatarService represents a service for managing users avatars.
 type AvatarService interface {
+	FindByUserID(id uint) (*Avatar, error)
+
 	CreateOne(url string) error
 
 	UpdateOne(url string) error
