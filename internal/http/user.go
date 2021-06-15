@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
@@ -25,14 +24,9 @@ func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
 		ID:       id,
 		Username: "string",
 	}
-	serAvatarURL(&u, r)
 	respondJSON(w, 200, u)
 }
 
 func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, 201, "Created")
-}
-
-func serAvatarURL(u *internal.User, r *http.Request) {
-	u.AvatarURL = fmt.Sprintf("%s/avatar", r.URL.String())
 }
