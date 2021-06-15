@@ -2,11 +2,23 @@
 
 Shrinker is a web api using a message queue in order to offload heavy computing tasks (namely image processing) to a worker.
 
-## Running the project
+## Getting started
+
+### Prerequisite
+
+First, a `.env` file must be provided at the root directory.
+For a quick start you can use the values from provided example.  
+
+```sh
+echo "$(cat .env.example)" >> .env
+```
+### Run the project
+
+:warning: to be updated!
 
 ```sh
 # server
-go run ./cmd/server/main.go
+make start
 
 # worker
 go run ./cmd/worker/main.go
