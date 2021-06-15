@@ -4,14 +4,13 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/gorilla/mux"
 )
 
 // registerAvatarRoutes is a helper function for registering all avatar routes.
-func (s *Server) registerAvatarRoutes(r *mux.Router) {
-	r.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarGet).Methods("GET")
+func (s *Server) registerAvatarRoutes() {
+	s.router.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarGet).Methods("GET")
 
-	r.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarUpload).Methods("POST")
+	s.router.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarUpload).Methods("POST")
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {

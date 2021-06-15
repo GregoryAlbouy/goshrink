@@ -34,8 +34,8 @@ func NewServer(addr string, repo Repo) *Server {
 	// Register the routes.
 	s.router.HandleFunc("/", s.handleIndex)
 
-	s.registerUserRoutes(s.router)
-	s.registerAvatarRoutes(s.router)
+	s.registerUserRoutes()
+	s.registerAvatarRoutes()
 
 	s.Handler = s.router
 	return s

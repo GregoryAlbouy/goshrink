@@ -5,14 +5,13 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/gorilla/mux"
 )
 
 // registerUserRoutes is a helper function for registering all user routes.
-func (s *Server) registerUserRoutes(r *mux.Router) {
-	r.HandleFunc("/users/{id:[0-9]+}", s.handleUserGet).Methods("GET")
+func (s *Server) registerUserRoutes() {
+	s.router.HandleFunc("/users/{id:[0-9]+}", s.handleUserGet).Methods("GET")
 
-	r.HandleFunc("/users", s.handleUserCreate).Methods("POST")
+	s.router.HandleFunc("/users", s.handleUserCreate).Methods("POST")
 }
 
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
