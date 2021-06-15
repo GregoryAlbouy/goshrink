@@ -18,7 +18,11 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAvatarGet(w http.ResponseWriter, r *http.Request) {
-	id, _ := extractID(r)
+	id, err := extractID(r)
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest)
+		return
+	}
 
 	a := internal.Avatar{
 		UserID: id,

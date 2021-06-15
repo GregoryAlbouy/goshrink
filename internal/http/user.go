@@ -15,13 +15,17 @@ func (s *Server) registerUserRoutes() {
 }
 
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
-	id, _ := extractID(r)
+	id, err := extractID(r)
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest)
+		return
+	}
 
 	u := internal.User{
 		ID:       id,
 		Username: "string",
 	}
-	serAvatarUrl(&u, r)
+	serAvatarURL(&u, r)
 	respondJSON(w, 200, u)
 }
 
@@ -29,6 +33,6 @@ func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, 201, "Created")
 }
 
-func serAvatarUrl(u *internal.User, r *http.Request) {
+func serAvatarURL(u *internal.User, r *http.Request) {
 	u.AvatarURL = fmt.Sprintf("%s/avatar", r.URL.String())
 }

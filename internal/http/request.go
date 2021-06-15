@@ -9,7 +9,7 @@ import (
 )
 
 // extractID retreives the route parameter "id" from the mux route variables.
-// Also validates the ID format.
+// Also validates the ID is an integer.
 func extractID(r *http.Request) (int, error) {
 	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {

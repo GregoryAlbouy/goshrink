@@ -14,7 +14,8 @@ type Server struct {
 	Repo
 }
 
-// Repo exposes the available operations to access the data layer. Operations are regrouped under services.
+// Repo exposes the available operations to access the data layer.
+// Operations are grouped under services.
 type Repo struct {
 	UserService   internal.UserService
 	AvatarService internal.AvatarService
@@ -31,13 +32,9 @@ func NewServer(addr string, repo Repo) *Server {
 		},
 	}
 
-	// Register the routes.
-	s.router.HandleFunc("/", s.handleIndex)
-
-	s.registerUserRoutes()
-	s.registerAvatarRoutes()
-
+	s.registerAllRoutes()
 	s.Handler = s.router
+
 	return s
 }
 
@@ -49,6 +46,14 @@ func (s *Server) Start() error {
 		return err
 	}
 	return nil
+}
+
+// registerAllRoutes registers each entity's routes on the server.
+func (s *Server) registerAllRoutes() {
+	s.router.HandleFunc("/", s.handleIndex)
+
+	s.registerUserRoutes()
+	s.registerAvatarRoutes()
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
