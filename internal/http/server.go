@@ -17,8 +17,7 @@ type Server struct {
 // Repo exposes the available operations to access the data layer.
 // Operations are grouped under services.
 type Repo struct {
-	UserService   internal.UserService
-	AvatarService internal.AvatarService
+	UserService internal.UserService
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
@@ -27,8 +26,7 @@ func NewServer(addr string, repo Repo) *Server {
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
 		Repo: Repo{
-			UserService:   repo.UserService,
-			AvatarService: repo.AvatarService,
+			UserService: repo.UserService,
 		},
 	}
 

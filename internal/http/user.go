@@ -16,17 +16,34 @@ func (s *Server) registerUserRoutes() {
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
 	id, err := extractID(r)
 	if err != nil {
-		respondHTTPError(w, ErrBadRequest)
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}
 
-	u := internal.User{
-		ID:       id,
-		Username: "string",
+	u, err := s.UserService.FindByID(id)
+	if err != nil {
+		respondHTTPError(w, ErrNotFound.Wrap(err))
+		return
 	}
 	respondJSON(w, 200, u)
 }
 
 func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, 201, "Created")
+	in := internal.UserInput{}
+	if err := decodeBody(r.Body, &in); err != nil {
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
+	}
+
+	u := internal.NewUser(in)
+	if err := u.Validate(); err != nil {
+		respondHTTPError(w, ErrUnprocessableEntity.Wrap(err))
+		return
+	}
+
+	if err := s.UserService.InsertOne(*u); err != nil {
+		respondHTTPError(w, ErrInternal)
+		return
+	}
+	respondJSON(w, 201, "Created\n")
 }
