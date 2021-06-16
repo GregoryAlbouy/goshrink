@@ -22,6 +22,7 @@ const (
 
 // env is a map of environment variables. It is set using loadEnv function.
 var env = map[string]string{
+	"API_PORT":            "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -59,16 +60,7 @@ func run(envPath string, migrate bool) error {
 		migrateMockUsers(db)
 	}
 
-	// Just a temp test to make sure things work as expected.
-	// TODO: create a unit test instead
-	us := database.NewUserService(db)
-	u, err := us.FindByID(7)
-	if err != nil {
-		return err
-	}
-	fmt.Println(u)
-
-	srv := initServer(db)
+	srv := initApiServer(db)
 	if err := srv.Start(); err != nil {
 		return err
 	}
@@ -132,10 +124,11 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB) *http.Server {
+func initApiServer(db *database.DB) *http.Server {
+	addr := ":" + env["API_PORT"]
 	repo := http.Repo{
 		UserService: database.NewUserService(db),
 	}
 
-	return http.NewServer(":9999", repo)
+	return http.NewServer(addr, repo)
 }
