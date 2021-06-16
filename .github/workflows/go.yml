@@ -19,7 +19,7 @@ jobs:
 
       # Build
       - name: Build Server
-        run: go build -v ./cmd/server/*.go
+        run: go build -v ./cmd/server/main.go
 
       - name: Build Worker
         run: go build -v ./cmd/worker/main.go

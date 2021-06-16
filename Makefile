@@ -5,7 +5,7 @@ start:
 
 .PHONY: run
 run:
-	@go run cmd/server/*.go
+	@go run cmd/server/main.go
 
 .PHONY: docker
 docker:

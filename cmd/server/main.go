@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
+	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/joho/godotenv"
 )
 
@@ -115,4 +116,12 @@ func mustInitDatabase() *database.DB {
 	db.MustInit(cfg)
 
 	return db
+}
+
+func migrateMockUsers(db *database.DB) {
+	userService := database.NewUserService(db)
+	users := mock.Users
+	if err := userService.Migrate(users); err != nil {
+		log.Fatal(err)
+	}
 }
