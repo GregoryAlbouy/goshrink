@@ -58,7 +58,7 @@ func run(envPath string, migrate bool) error {
 	}
 
 	// Just a temp test to make sure things work as expected.
-	// Spoiler: they don't
+	// TODO: create a unit test instead
 	us := database.NewUserService(db)
 	u, err := us.FindByID(7)
 	if err != nil {

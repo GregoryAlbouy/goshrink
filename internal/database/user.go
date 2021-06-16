@@ -20,10 +20,6 @@ func NewUserService(db *DB) internal.UserService {
 }
 
 // FindByID retrieves a user by its ID.
-//
-// FIXME: this methods returns an error if the user does not have an avatar.
-// This is due to the assignement of NULL to a string. See sql.NullString.
-// Still looking for a fix at the moment.
 func (s *userService) FindByID(userID int) (internal.User, error) {
 	u := internal.User{}
 

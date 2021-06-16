@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS avatar (
 
 const userAvatarSchema = `
 CREATE OR REPLACE VIEW V_user_avatar
-AS SELECT u.id, u.username, u.email, a.avatar_url
+AS SELECT u.id, u.username, u.email, COALESCE(a.avatar_url, '') AS avatar_url
 FROM user u
 LEFT JOIN avatar a
 	ON u.id = a.user_id
