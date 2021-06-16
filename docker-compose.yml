@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_PORT
+      - MYSQL_VOLUME_PATH
+    ports: ["${MYSQL_PORT}:${MYSQL_PORT}"]
+    volumes:
+      - "${MYSQL_VOLUME_PATH}:/var/lib/mysql"
+
+  adminer:
+    depends_on: [mysql]
+    image: adminer
+    restart: always
+    ports:
+      - 8085:8080
