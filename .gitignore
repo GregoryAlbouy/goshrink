@@ -1,0 +1,8 @@
+# Environment
+/.env
+
+# Docker volumes
+/.volumes
+
+# Mac
+.DS_Store
