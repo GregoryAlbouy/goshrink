@@ -1,4 +1,4 @@
-## Desciption
+## Description
 
 <!-- Describe the purpose of the issue, why a change has to be done, and how if possible -->
 

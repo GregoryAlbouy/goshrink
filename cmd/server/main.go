@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
+	"github.com/GregoryAlbouy/shrinker/internal/http"
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +22,7 @@ const (
 
 // env is a map of environment variables. It is set using loadEnv function.
 var env = map[string]string{
+	"API_SERVER_PORT":     "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -31,6 +33,7 @@ var env = map[string]string{
 func main() {
 	// Read migrate CLI flag
 	migrate := flag.Bool("m", false, "use mock users")
+	verbose := flag.Bool("v", false, "verbose mode")
 	flag.Parse()
 
 	// Get environment file
@@ -39,12 +42,12 @@ func main() {
 		envPath = defaultEnvPath
 	}
 
-	if err := run(envPath, *migrate); err != nil {
+	if err := run(envPath, *migrate, *verbose); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(envPath string, migrate bool) error {
+func run(envPath string, migrate bool, verbose bool) error {
 	if err := loadEnv(envPath); err != nil {
 		return err
 	}
@@ -58,14 +61,10 @@ func run(envPath string, migrate bool) error {
 		migrateMockUsers(db)
 	}
 
-	// Just a temp test to make sure things work as expected.
-	// TODO: create a unit test instead
-	us := database.NewUserService(db)
-	u, err := us.FindByID(7)
-	if err != nil {
+	srv := initServer(db, verbose)
+	if err := srv.Start(); err != nil {
 		return err
 	}
-	fmt.Println(u)
 
 	return nil
 }
@@ -124,4 +123,13 @@ func migrateMockUsers(db *database.DB) {
 	if err := userService.Migrate(users); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initServer(db *database.DB, verbose bool) *http.Server {
+	addr := ":" + env["API_SERVER_PORT"]
+	repo := http.Repository{
+		UserService: database.NewUserService(db),
+	}
+
+	return http.NewServer(addr, repo, verbose)
 }

@@ -44,13 +44,17 @@ go run ./cmd/worker/main.go
 
 ## Control flow
 
-The control flow of the update of a user's avatar is as follow:
+Request to the API to upload an avatar:
 
 ```txt
-POST /avatars
+POST /api/v1/users/{id}/avatar
+
+content:
+<file>
+{"user_id": 1}
 ```
 
-![control flow schema](docs/control_flow.svg)
+![image upload flowchart](docs/control_flow.svg)
 
 ## Project structure
 
