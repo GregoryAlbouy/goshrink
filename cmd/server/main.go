@@ -22,7 +22,7 @@ const (
 
 // env is a map of environment variables. It is set using loadEnv function.
 var env = map[string]string{
-	"API_PORT":            "",
+	"API_SERVER_PORT":     "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -126,7 +126,7 @@ func migrateMockUsers(db *database.DB) {
 }
 
 func initServer(db *database.DB, verbose bool) *http.Server {
-	addr := ":" + env["API_PORT"]
+	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
