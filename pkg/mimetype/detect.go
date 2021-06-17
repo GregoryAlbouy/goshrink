@@ -19,5 +19,5 @@ func Detect(file io.Reader) (string, error) {
 func IsImage(file io.Reader) bool {
 	// An error while reading the file is interpreted as "not an image".
 	kind, _ := Detect(file)
-	return kind == jpeg || kind == png
+	return kind == JPEG || kind == PNG
 }
