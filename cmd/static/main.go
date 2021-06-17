@@ -1,19 +1,37 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 )
 
+const (
+	defaultEnvPath = "./.env"
+)
+
+// env is a map of environment variables. It is set using loadEnv function.
+var env = map[string]string{
+	"STATIC_SERVER_PORT": "",
+	"STATIC_FILE_PATH":   "",
+}
+
 func main() {
+	// Load env
+	envPath := dotenv.GetPath(defaultEnvPath)
+	dotenv.Load(envPath, &env)
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./storage"))))
 	http.HandleFunc("/static/avatar", handleFileUpload)
 
-	println("Server listening at http://localhost:8000")
+	addr := ":" + env["STATIC_SERVER_PORT"]
+	fmt.Printf("Server listening at http://localhost%s\n", addr)
 
-	if err := http.ListenAndServe(":8000", nil); err != nil {
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }

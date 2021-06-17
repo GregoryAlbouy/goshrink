@@ -2,15 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
 	"github.com/GregoryAlbouy/shrinker/internal/http"
 	"github.com/GregoryAlbouy/shrinker/mock"
-	"github.com/joho/godotenv"
+	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 )
 
 const (
@@ -36,10 +33,7 @@ func main() {
 	flag.Parse()
 
 	// Get environment file
-	envPath := os.Getenv("ENV_PATH")
-	if envPath == "" {
-		envPath = defaultEnvPath
-	}
+	envPath := dotenv.GetPath(defaultEnvPath)
 
 	if err := run(envPath, *migrate, *verbose); err != nil {
 		log.Fatal(err)
@@ -47,7 +41,7 @@ func main() {
 }
 
 func run(envPath string, migrate bool, verbose bool) error {
-	if err := loadEnv(envPath); err != nil {
+	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
 	}
 
@@ -63,37 +57,6 @@ func run(envPath string, migrate bool, verbose bool) error {
 	srv := initServer(db, verbose)
 	if err := srv.Start(); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// loadEnv reads values from the given filepath
-// and stores them in `env` map.
-// It returns an error if one is missing.
-func loadEnv(filepath string) error {
-
-	// Read env file
-	envMap, err := godotenv.Read(filepath)
-	if err != nil {
-		return err
-	}
-
-	// Set env values and catch the missing ones
-	missingEnv := []string{}
-	for k := range env {
-		if v, ok := envMap[k]; !ok {
-			missingEnv = append(missingEnv, k)
-		} else {
-			env[k] = v
-		}
-	}
-
-	// If one or more is missing, return an error
-	// with a list of missing variables.
-	if len(missingEnv) != 0 {
-		missingEnvStr := strings.Join(missingEnv, ",")
-		return fmt.Errorf("missing environment variables: %s", missingEnvStr)
 	}
 
 	return nil
