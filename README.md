@@ -19,13 +19,11 @@ A mysql docker instance must be running:
 make docker
 ```
 
-
 Once the instance is ready, run the executable with `-m` flag to perform mock migrations:
 
 ```sh
 go run cmd/server/main.go -m
 ```
-
 
 ### Run the project
 

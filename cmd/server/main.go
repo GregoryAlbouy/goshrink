@@ -17,7 +17,6 @@ const (
 	// defaultEnvPath is the path used to read environment variables,
 	// if ENV_PATH is not set.
 	defaultEnvPath = "./.env"
-	mockUsersPath  = "./mock/users.json"
 )
 
 // env is a map of environment variables. It is set using loadEnv function.
