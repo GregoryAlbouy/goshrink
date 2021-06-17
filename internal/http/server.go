@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
@@ -21,13 +22,17 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository) *Server {
+func NewServer(addr string, repo Repository, verbose bool) *Server {
 	s := &Server{
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
 		Repository: Repository{
 			UserService: repo.UserService,
 		},
+	}
+
+	if verbose {
+		s.router.Use(requestLogger)
 	}
 
 	s.registerAllRoutes()
@@ -58,4 +63,12 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text-plain")
 	w.WriteHeader(200)
 	w.Write([]byte("Hello World!"))
+}
+
+// requestLogger middleware logs all endpoint calls to the standard output.
+func requestLogger(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s", r.Method, r.URL.String())
+		h.ServeHTTP(w, r)
+	})
 }
