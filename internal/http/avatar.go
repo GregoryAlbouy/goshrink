@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
 )
 
 // registerAvatarRoutes is a helper function for registering all avatar routes.
@@ -12,26 +12,24 @@ func (s *Server) registerAvatarRoutes() {
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	id, err := extractID(r)
+	file, _, err := r.FormFile("upload")
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
+	}
+	defer file.Close()
+
+	if !mimetype.IsImage(file) {
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
+	}
+
+	// There is no use for the user id for now. It will be passed to the queue.
+	_, err = extractID(r)
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}
 
-	in := internal.AvatarInput{}
-	if err := decodeBody(r.Body, &in); err != nil {
-		respondHTTPError(w, ErrBadRequest.Wrap(err))
-		return
-	}
-
-	if err := in.Validate(); err != nil {
-		respondHTTPError(w, ErrUnprocessableEntity.Wrap(err))
-		return
-	}
-
-	if err := s.UserService.SetAvatarURL(id, in.URL); err != nil {
-		respondHTTPError(w, ErrInternal)
-		return
-	}
 	respondJSON(w, 202, "Accepted\n")
 }
