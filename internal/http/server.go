@@ -11,21 +11,21 @@ import (
 type Server struct {
 	*http.Server
 	router *mux.Router
-	Repo
+	Repository
 }
 
-// Repo exposes the available operations to access the data layer.
+// Repository exposes the available operations to access the data layer.
 // Operations are grouped under services.
-type Repo struct {
+type Repository struct {
 	UserService internal.UserService
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repo) *Server {
+func NewServer(addr string, repo Repository) *Server {
 	s := &Server{
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
-		Repo: Repo{
+		Repository: Repository{
 			UserService: repo.UserService,
 		},
 	}

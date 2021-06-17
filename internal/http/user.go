@@ -22,7 +22,7 @@ func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
 
 	u, err := s.UserService.FindByID(id)
 	if err != nil {
-		respondHTTPError(w, ErrNotFound.Wrap(err))
+		respondHTTPError(w, ErrNotFound)
 		return
 	}
 	respondJSON(w, 200, u)

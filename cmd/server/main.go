@@ -60,7 +60,7 @@ func run(envPath string, migrate bool) error {
 		migrateMockUsers(db)
 	}
 
-	srv := initApiServer(db)
+	srv := initServer(db)
 	if err := srv.Start(); err != nil {
 		return err
 	}
@@ -124,9 +124,9 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initApiServer(db *database.DB) *http.Server {
+func initServer(db *database.DB) *http.Server {
 	addr := ":" + env["API_PORT"]
-	repo := http.Repo{
+	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
 
