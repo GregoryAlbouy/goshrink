@@ -16,14 +16,12 @@ const (
 	defaultEnvPath = "./.env"
 )
 
-// env is a map of environment variables. It is set using loadEnv function.
 var env = map[string]string{
 	"STATIC_SERVER_PORT": "",
 	"STATIC_FILE_PATH":   "",
 }
 
 func main() {
-	// Load env
 	envPath := dotenv.GetPath(defaultEnvPath)
 	dotenv.Load(envPath, &env)
 

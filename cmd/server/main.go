@@ -11,12 +11,9 @@ import (
 )
 
 const (
-	// defaultEnvPath is the path used to read environment variables,
-	// if ENV_PATH is not set.
 	defaultEnvPath = "./.env"
 )
 
-// env is a map of environment variables. It is set using loadEnv function.
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
 	"MYSQL_USER":          "",
@@ -27,12 +24,10 @@ var env = map[string]string{
 }
 
 func main() {
-	// Read migrate CLI flag
 	migrate := flag.Bool("m", false, "use mock users")
 	verbose := flag.Bool("v", false, "verbose mode")
 	flag.Parse()
 
-	// Get environment file
 	envPath := dotenv.GetPath(defaultEnvPath)
 
 	if err := run(envPath, *migrate, *verbose); err != nil {

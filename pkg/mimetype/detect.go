@@ -7,6 +7,7 @@ import (
 
 // Detect returns the MIME type of file. The file must be provided as a stream.
 func Detect(file io.Reader) (string, error) {
+	// Only the first 512 bytes are needed to get the content type.
 	buf := make([]byte, 512)
 
 	if _, err := file.Read(buf); err != nil {
