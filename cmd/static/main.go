@@ -84,7 +84,10 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request", 400)
 		return
 	}
-	// Infer the extension.
+	// Place the pointer back at the start of the file
+	file.Seek(0, io.SeekStart)
+
+	// Infer the extension
 	var ext string
 	switch kind {
 	case mimetype.PNG:
@@ -101,15 +104,14 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	// Create a destination on disk
 	dst, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
-		http.Error(w, "internal error", 500)
+		http.Error(w, "internal error: failed to create file", 500)
 		return
 	}
 	defer dst.Close()
 
 	// Copy all bytes from the file to the destination on disk
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		http.Error(w, "internal error", 500)
+	if _, err = io.Copy(dst, file); err != nil {
+		http.Error(w, "internal error: failed to copy file", 500)
 		return
 	}
 
