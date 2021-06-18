@@ -37,7 +37,7 @@ func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 
 	u := internal.NewUser(in)
 	if err := u.Validate(); err != nil {
-		respondHTTPError(w, ErrUnprocessableEntity.Wrap(err))
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}
 

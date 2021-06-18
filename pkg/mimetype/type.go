@@ -1,6 +1,6 @@
 package mimetype
 
 const (
-	jpeg = "image/jpeg"
-	png  = "image/png"
+	JPEG = "image/jpeg"
+	PNG  = "image/png"
 )
