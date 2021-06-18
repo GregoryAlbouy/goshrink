@@ -7,7 +7,8 @@ import (
 )
 
 type Producer struct {
-	conn *amqp.Connection
+	conn    *amqp.Connection
+	verbose bool
 }
 
 func (p *Producer) start() error {
@@ -21,7 +22,7 @@ func (p *Producer) start() error {
 }
 
 // Publish a message to the AMQP exchange.
-func (p *Producer) Publish(msg string) error {
+func (p *Producer) Publish(msg []byte) error {
 	ch, err := p.conn.Channel()
 	if err != nil {
 		return err
@@ -42,20 +43,24 @@ func (p *Producer) Publish(msg string) error {
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
-			Body:         []byte(msg),
+			Body:         msg,
 		},
 	)
 	if err != nil {
 		return err
 	}
-	log.Printf("sending message: %s -> %s", msg, q.Name)
+
+	if p.verbose {
+		log.Printf("sending message: %s -> %s", msg, q.Name)
+	}
 
 	return nil
 }
 
-func NewProducer(conn *amqp.Connection) (Producer, error) {
+func NewProducer(conn *amqp.Connection, verbose bool) (Producer, error) {
 	producer := Producer{
-		conn: conn,
+		conn:    conn,
+		verbose: verbose,
 	}
 	if err := producer.start(); err != nil {
 		return Producer{}, err

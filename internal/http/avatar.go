@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
@@ -12,7 +13,7 @@ func (s *Server) registerAvatarRoutes() {
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("upload")
+	file, headers, err := r.FormFile("upload")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
@@ -24,11 +25,15 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// There is no use for the user id for now. It will be passed to the queue.
-	_, err = extractID(r)
+	id, err := extractID(r)
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
+	}
+
+	msg := []byte(fmt.Sprintf("user %d uploading %s", id, headers.Filename))
+	if err = s.producer.Publish(msg); err != nil {
+		respondHTTPError(w, ErrInternal.Wrap(err))
 	}
 
 	respondJSON(w, 202, "Accepted\n")

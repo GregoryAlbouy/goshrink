@@ -6,13 +6,16 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/gorilla/mux"
+	"github.com/streadway/amqp"
 )
 
 type Server struct {
 	*http.Server
 	router *mux.Router
 	Repository
+	producer queue.Producer
 }
 
 // Repository exposes the available operations to access the data layer.
@@ -22,13 +25,19 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, verbose bool) *Server {
+func NewServer(addr string, repo Repository, conn *amqp.Connection, verbose bool) (*Server, error) {
+	prod, err := queue.NewProducer(conn, verbose)
+	if err != nil {
+		return nil, err
+	}
+
 	s := &Server{
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
 		Repository: Repository{
 			UserService: repo.UserService,
 		},
+		producer: prod,
 	}
 
 	if verbose {
@@ -38,7 +47,7 @@ func NewServer(addr string, repo Repository, verbose bool) *Server {
 	s.registerAllRoutes()
 	s.Handler = s.router
 
-	return s
+	return s, nil
 }
 
 // Start launches the server.
