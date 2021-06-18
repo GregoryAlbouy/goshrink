@@ -11,7 +11,8 @@ import (
 const defaultEnvPath = "./.env"
 
 var env = map[string]string{
-	"QUEUE_URL": "",
+	"QUEUE_URL":  "",
+	"QUEUE_NAME": "",
 }
 
 func main() {
@@ -26,6 +27,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
+
+	queue.SetQueueName(env["QUEUE_NAME"])
 
 	consumer, err := queue.NewConsumer(conn)
 	if err != nil {

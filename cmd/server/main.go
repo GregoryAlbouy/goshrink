@@ -8,6 +8,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/internal/http"
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
+	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/streadway/amqp"
 )
 
@@ -16,6 +17,7 @@ const defaultEnvPath = "./.env"
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
 	"QUEUE_URL":           "",
+	"QUEUE_NAME":          "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -55,6 +57,8 @@ func run(envPath string, migrate bool, verbose bool) error {
 		log.Fatal(err)
 	}
 	defer conn.Close()
+
+	queue.SetQueueName(env["QUEUE_NAME"])
 
 	srv, err := initServer(db, conn, verbose)
 	if err != nil {
