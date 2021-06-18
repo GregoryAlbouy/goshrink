@@ -131,7 +131,7 @@ Other directories are self explanatory.
 
 Also, sub-packages have their own documentation when relevant that you may refer to for further explanation. Notably:
 
-- [database](internal/database/README.md)
 - [http](internal/http/README.md) (comes with handy curl commands)
-- [queue](pkg/queue/README.md)
+- [database](internal/database/README.md)
 - [static](cmd/static/README.md)
+- [queue](pkg/queue/README.md)

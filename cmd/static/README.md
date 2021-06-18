@@ -13,7 +13,7 @@ It is a public endpoint, anybody can retrieve and view a user's avatar.
 Request:
 
 ```sh
-curl -X GET http://localhost:9999/static/{UUID}.{png,jpeg}
+curl -X GET http://localhost:9999/static/sample.png
 ```
 
 Response:
