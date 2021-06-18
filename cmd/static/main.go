@@ -17,8 +17,9 @@ const (
 )
 
 var env = map[string]string{
-	"STATIC_SERVER_PORT": "",
 	"STATIC_FILE_PATH":   "",
+	"STATIC_SERVER_PORT": "",
+	"STATIC_SERVER_KEY":  "",
 }
 
 func main() {
@@ -27,10 +28,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fs := http.Dir(env["STATIC_FILE_PATH"])
+
 	// GET /static/<filename>
-	http.Handle("/static/", handleFileServe("/static", env["STATIC_FILE_PATH"]))
+	http.Handle("/static/", handleFileServe("/static", fs))
 	// POST /static/avatar
-	http.HandleFunc("/static/avatar", handleImageUpload)
+	http.HandleFunc("/static/avatar", authenticate(handleImageUpload))
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 	fmt.Printf("Server listening at http://localhost%s\n", addr)
@@ -40,9 +43,9 @@ func main() {
 	}
 }
 
-// handleFileServe serves files under the given directory for the given path.
-func handleFileServe(path string, dir string) http.Handler {
-	return http.StripPrefix(path, disableDirListing(http.FileServer(http.Dir(dir))))
+// handleFileServe serves at the given path the files under the given directory.
+func handleFileServe(path string, dir http.Dir) http.Handler {
+	return http.StripPrefix(path, disableDirListing(http.FileServer(dir)))
 }
 
 // disableDirListing prevents http.FileServer from automatically generating
@@ -51,7 +54,7 @@ func handleFileServe(path string, dir string) http.Handler {
 func disableDirListing(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/") {
-			http.Error(w, "not found", 404)
+			http.Error(w, "404 page not found", 404)
 			return
 		}
 
@@ -112,4 +115,27 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(201)
 	w.Write([]byte("Created\n"))
+}
+
+// bearer represents the string prefixing the authorization key contained in
+// the authorization headers: "Bearer <key>".
+const bearer = "Bearer "
+
+func authenticate(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		v := r.Header.Get("Authorization")
+		if !strings.HasPrefix(v, bearer) {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		key := strings.TrimPrefix(v, bearer)
+
+		if key != env["STATIC_SERVER_KEY"] {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
