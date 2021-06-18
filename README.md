@@ -28,9 +28,12 @@ go run cmd/server/main.go -m
 ### Run the project
 
 ```sh
-# server
+# api server
 # alias to make docker && go run cmd/server/main.go
 make start
+
+# static server
+go run cmd/static/*.go
 
 # worker
 go run ./cmd/worker/main.go
