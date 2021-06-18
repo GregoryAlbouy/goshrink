@@ -15,6 +15,7 @@ const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
+	"QUEUE_URL":           "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -49,7 +50,7 @@ func run(envPath string, migrate bool, verbose bool) error {
 	}
 
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
+	conn, err := amqp.Dial(env["QUEUE_URL"])
 	if err != nil {
 		log.Fatal(err)
 	}
