@@ -2,11 +2,38 @@
 
 Shrinker is a web api using a message queue in order to offload heavy computing tasks (namely image processing) to a worker.
 
-## Running the project
+## Getting started
+
+### Prerequisite for the first start
+
+First, a .env file must be provided at the root directory.
+For a quick start you can use the values from provided example.
 
 ```sh
-# server
-go run ./cmd/server/main.go
+echo "$(cat .env.example)" >> .env
+```
+
+A mysql docker instance must be running:
+
+```sh
+make docker
+```
+
+Once the instance is ready, run the executable with `-m` flag to perform mock migrations:
+
+```sh
+go run cmd/server/main.go -m
+```
+
+### Run the project
+
+```sh
+# api server
+# alias to make docker && go run cmd/server/main.go
+make start
+
+# static server
+go run cmd/static/*.go
 
 # worker
 go run ./cmd/worker/main.go
@@ -18,13 +45,17 @@ go run ./cmd/worker/main.go
 
 ## Control flow
 
-The control flow of the update of a user's avatar is as follow:
+Request to the API to upload an avatar:
 
 ```txt
-POST /avatars
+POST /api/v1/users/{id}/avatar
+
+content:
+<file>
+{"user_id": 1}
 ```
 
-![control flow schema](docs/control_flow.svg)
+![image upload flowchart](docs/control_flow.svg)
 
 ## Project structure
 
