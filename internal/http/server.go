@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -52,7 +51,7 @@ func NewServer(addr string, repo Repository, conn *amqp.Connection, verbose bool
 
 // Start launches the server.
 func (s *Server) Start() error {
-	fmt.Printf("Server listening at http://localhost%s\n", s.Addr)
+	log.Printf("Server listening at http://localhost%s\n", s.Addr)
 
 	if err := s.ListenAndServe(); err != nil {
 		return err
