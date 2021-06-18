@@ -10,9 +10,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 )
 
-const (
-	defaultEnvPath = "./.env"
-)
+const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"API_SERVER_PORT":     "",

@@ -12,9 +12,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
 )
 
-const (
-	defaultEnvPath = "./.env"
-)
+const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"STATIC_FILE_PATH":   "",
@@ -71,7 +69,7 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieve the file
-	file, _, err := r.FormFile("upload")
+	file, headers, err := r.FormFile("upload")
 	if err != nil {
 		http.Error(w, "bad request", 400)
 		return
@@ -79,30 +77,15 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	// Ensure it is a valid image
-	kind, err := mimetype.Detect(file)
-	if err != nil {
+	if !mimetype.IsImage(file) {
 		http.Error(w, "bad request", 400)
 		return
 	}
 	// Place the pointer back at the start of the file
 	file.Seek(0, io.SeekStart)
 
-	// Infer the extension
-	var ext string
-	switch kind {
-	case mimetype.PNG:
-		ext = ".png"
-	case mimetype.JPEG:
-		ext = ".jpeg"
-	default:
-		http.Error(w, "bad request", 400)
-		return
-	}
-
-	filepath := env["STATIC_FILE_PATH"] + "/foo" + ext
-
 	// Create a destination on disk
-	dst, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
+	dst, err := os.OpenFile(getFilepath(headers.Filename), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		http.Error(w, "internal error: failed to create file", 500)
 		return
@@ -117,6 +100,16 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(201)
 	w.Write([]byte("Created\n"))
+}
+
+// getFilepath efficiently builds a filepath string from the given filename.
+func getFilepath(filename string) string {
+	var sb strings.Builder
+	parts := []string{env["STATIC_FILE_PATH"], "/", filename}
+	for _, v := range parts {
+		sb.WriteString(v)
+	}
+	return sb.String()
 }
 
 // bearer represents the string prefixing the authorization key contained in
