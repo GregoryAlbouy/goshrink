@@ -5,14 +5,15 @@ import (
 	"net/http"
 )
 
+const contentTypeMaxBytes = 512
+
 // Detect returns the MIME type of file. The file must be provided as a stream.
 //
 // Using Detect moves the pointer reading bytes of the io.Reader. It the file
 // needs to be read again, make sure to move the pointer back at the start with
 // `file.Seek(0, io.SeekStart)`.
 func Detect(file io.Reader) (string, error) {
-	// Only the first 512 bytes are needed to get the content type.
-	buf := make([]byte, 512)
+	buf := make([]byte, contentTypeMaxBytes)
 
 	if _, err := file.Read(buf); err != nil {
 		return "", err

@@ -16,7 +16,7 @@ func handleFileServe(path string, dir http.Dir) http.Handler {
 func disableDirListing(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/") {
-			http.Error(w, "404 page not found", 404)
+			http.Error(w, "404 page not found", http.StatusNotFound)
 			return
 		}
 		next.ServeHTTP(w, r)

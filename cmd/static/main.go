@@ -27,7 +27,7 @@ func main() {
 	// GET /static/<filename>
 	http.Handle("/static/", handleFileServe("/static", fs))
 	// POST /static/avatar
-	http.HandleFunc("/static/avatar", authenticate(handleImageUpload))
+	http.HandleFunc("/static/avatar", requireAPIKey(handleImageUpload))
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 
