@@ -37,7 +37,11 @@ go run cmd/server/main.go -m
 
 <!-- Message queue docker set up here -->
 
-<!-- Static server does not need any particular set up -->
+The static file server expects to store and serve images from `./storage`. You must create this folder, from the root run:
+
+```sh
+mkdir storage
+```
 
 ### Run the project
 
