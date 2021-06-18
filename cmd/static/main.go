@@ -23,7 +23,9 @@ var env = map[string]string{
 
 func main() {
 	envPath := dotenv.GetPath(defaultEnvPath)
-	dotenv.Load(envPath, &env)
+	if err := dotenv.Load(envPath, &env); err != nil {
+		log.Fatal(err)
+	}
 
 	// GET /static/<filename>
 	http.Handle("/static/", handleFileServe("/static", env["STATIC_FILE_PATH"]))
