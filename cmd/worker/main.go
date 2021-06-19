@@ -38,6 +38,6 @@ func main() {
 }
 
 func logMessage(d amqp.Delivery) error {
-	log.Printf("received a message: %s", d.Body)
+	log.Printf("received a message: upload from user %s", d.MessageId)
 	return nil
 }

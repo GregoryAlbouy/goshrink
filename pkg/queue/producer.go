@@ -21,8 +21,8 @@ func (p *Producer) start() error {
 	return nil
 }
 
-// Publish a message to the queue.
-func (p *Producer) Publish(msg []byte) error {
+// Publish a message to the queue. id is an arbitrary identifier for the message.
+func (p *Producer) Publish(msg []byte, id string) error {
 	ch, err := p.conn.Channel()
 	if err != nil {
 		return err
@@ -44,6 +44,7 @@ func (p *Producer) Publish(msg []byte) error {
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
 			Body:         msg,
+			MessageId:    id,
 		},
 	)
 	if err != nil {
@@ -51,7 +52,7 @@ func (p *Producer) Publish(msg []byte) error {
 	}
 
 	if p.verbose {
-		log.Printf("sending message: %s -> %s", msg, q.Name)
+		log.Printf("message -> %s", q.Name)
 	}
 
 	return nil

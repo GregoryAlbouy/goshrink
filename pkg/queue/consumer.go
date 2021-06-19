@@ -60,9 +60,10 @@ func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
-			// For simplicity sake, we do not handle the error. For now.
-			job(d)
-			// Manually acknowledge a single message.
+			if err := job(d); err != nil {
+				log.Print(err)
+				d.Reject(false)
+			}
 			d.Ack(false)
 		}
 	}()

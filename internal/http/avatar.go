@@ -1,6 +1,7 @@
 package http
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 
@@ -13,7 +14,7 @@ func (s *Server) registerAvatarRoutes() {
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	file, headers, err := r.FormFile("upload")
+	file, _, err := r.FormFile("upload")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
@@ -31,8 +32,9 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg := []byte(fmt.Sprintf("user %d uploading %s", id, headers.Filename))
-	if err = s.producer.Publish(msg); err != nil {
+	msg := new(bytes.Buffer)
+	msg.ReadFrom(file)
+	if err = s.producer.Publish(msg.Bytes(), fmt.Sprint(id)); err != nil {
 		respondHTTPError(w, ErrInternal.Wrap(err))
 	}
 
