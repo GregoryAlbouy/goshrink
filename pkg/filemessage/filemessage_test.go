@@ -31,6 +31,29 @@ func TestConversion(t *testing.T) {
 	}
 }
 
+// Benchmarks
+
+func BenchmarkCompare(b *testing.B) {
+	b.Run("Struct encoding", BenchmarkStruct)
+	b.Run("JSON encoding", BenchmarkJSON)
+}
+
+func BenchmarkStruct(b *testing.B) {
+	msg := newFileMessage()
+
+	for i := 0; i < b.N; i++ {
+		msg.Bytes()
+	}
+}
+
+func BenchmarkJSON(b *testing.B) {
+	msg := newFileMessage()
+
+	for i := 0; i < b.N; i++ {
+		msg.JSONBytes()
+	}
+}
+
 // Helpers
 
 func newFileMessage() FileMessage {
