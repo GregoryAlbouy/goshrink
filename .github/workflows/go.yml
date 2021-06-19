@@ -17,13 +17,6 @@ jobs:
         with:
           go-version: 1.16
 
-      # Build
-      - name: Build Server
-        run: go build -v ./cmd/server/main.go
-
-      - name: Build Worker
-        run: go build -v ./cmd/worker/main.go
-
       # Check Go code format
       - name: Lint
         run: "! gofmt -l . 2>&1 | read"
@@ -35,3 +28,10 @@ jobs:
       # Run Go unit tests
       - name: Test
         run: go test -v ./...
+
+      # Build
+      - name: Build Server
+        run: go build -v ./cmd/server/main.go
+
+      - name: Build Worker
+        run: go build -v ./cmd/worker/main.go
