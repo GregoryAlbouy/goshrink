@@ -14,7 +14,7 @@ type Server struct {
 	*http.Server
 	router *mux.Router
 	Repository
-	uploadQueue queue.Producer
+	imageQueue queue.Producer
 }
 
 // Repository exposes the available operations to access the data layer.
@@ -36,7 +36,7 @@ func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (
 		Repository: Repository{
 			UserService: repo.UserService,
 		},
-		uploadQueue: prod,
+		imageQueue: prod,
 	}
 
 	if verbose {
