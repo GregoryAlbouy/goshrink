@@ -57,7 +57,7 @@ Response:
 
 ```json
 {
-  "token": "string"
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQxODMzMjAsImp0aSI6IjEifQ.gl2EQWCxszEHXkQkR4HIAhyhIxwufowdlaNJSOtIYek"
 }
 ```
 
@@ -66,7 +66,8 @@ Response:
 Request:
 
 ```sh
-curl -X POST -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/users/1/avatar
+curl -X POST -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQxODMzMjAsImp0aSI6IjEifQ.gl2EQWCxszEHXkQkR4HIAhyhIxwufowdlaNJSOtIYek" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/users/1/avatar
+
 ```
 
 Response:

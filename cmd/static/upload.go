@@ -66,7 +66,7 @@ func getFilepath(filename string) string {
 const bearer = "Bearer "
 
 func requireAPIKey(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		v := r.Header.Get("Authorization")
 		if !strings.HasPrefix(v, bearer) {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -80,5 +80,5 @@ func requireAPIKey(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		next.ServeHTTP(w, r)
-	})
+	}
 }

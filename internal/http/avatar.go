@@ -10,10 +10,23 @@ import (
 
 // registerAvatarRoutes is a helper function for registering all avatar routes.
 func (s *Server) registerAvatarRoutes() {
-	s.router.HandleFunc("/users/{id:[0-9]+}/avatar", s.handleAvatarUpload).Methods("POST")
+	s.router.HandleFunc("/users/{id:[0-9]+}/avatar", s.requireAuth(s.handleAvatarUpload)).Methods("POST")
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
+	id, err := extractID(r)
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
+	}
+
+	u := userFromContext(r.Context())
+	if u.ID != id {
+		respondHTTPError(w, ErrUnauthorized)
+		return
+	}
+
+	// File handling
 	file, _, err := r.FormFile("upload")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
@@ -22,12 +35,6 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	if !mimetype.IsImage(file) {
-		respondHTTPError(w, ErrBadRequest.Wrap(err))
-		return
-	}
-
-	id, err := extractID(r)
-	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}

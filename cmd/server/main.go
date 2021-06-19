@@ -9,6 +9,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/streadway/amqp"
 )
 
@@ -105,6 +106,8 @@ func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
+
+	simplejwt.SetSecretKey([]byte("63b98f9f3c2da8d7480c867357a225c0d5d7c131"))
 
 	return http.NewServer(addr, repo, q, verbose)
 }
