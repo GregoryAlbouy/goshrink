@@ -61,7 +61,7 @@ func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	go func() {
 		for d := range msgs {
 			if err := job(d); err != nil {
-				log.Print(err)
+				log.Printf("error processing %d: %s", d.DeliveryTag, err)
 				d.Reject(false)
 			}
 			d.Ack(false)
