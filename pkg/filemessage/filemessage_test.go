@@ -23,11 +23,11 @@ func TestConversion(t *testing.T) {
 	}
 
 	if in.ID != out.ID {
-		t.Error("ID are not equal")
+		t.Errorf("Expected inpout and output IDs to be equal, got %d, %d", in.ID, out.ID)
 	}
 
-	if bytes.Compare(in.File, out.File) != 0 {
-		t.Error("Files are not equal")
+	if !bytes.Equal(in.File, out.File) {
+		t.Error("Expected inpout and output files to be equal")
 	}
 }
 
@@ -50,14 +50,14 @@ func BenchmarkJSON(b *testing.B) {
 	msg := newFileMessage()
 
 	for i := 0; i < b.N; i++ {
-		msg.JSONBytes()
+		msg.BytesJSON()
 	}
 }
 
 // Helpers
 
 func newFileMessage() FileMessage {
-	img, err := os.ReadFile("image.png")
+	img, err := os.ReadFile("../../fixtures/sample.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}

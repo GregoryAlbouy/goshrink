@@ -25,10 +25,10 @@ func (msg FileMessage) Bytes() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// JSONBytes encodes a FileMessage struct into a slice of bytes
+// BytesJSON encodes a FileMessage struct into a slice of bytes
 // that can be decoded into JSON. It is about 4 times slower
 // than Bytes(), but the output is supported by any language.
-func (msg FileMessage) JSONBytes() ([]byte, error) {
+func (msg FileMessage) BytesJSON() ([]byte, error) {
 	buf := bytes.Buffer{}
 	enc := json.NewEncoder(&buf)
 
