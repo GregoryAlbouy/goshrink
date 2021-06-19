@@ -24,7 +24,7 @@ func main() {
 
 	conn, err := amqp.Dial(env["QUEUE_URL"])
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("rabbitmq error: %s", err)
 	}
 	defer conn.Close()
 

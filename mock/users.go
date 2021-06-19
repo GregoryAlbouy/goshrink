@@ -1,10 +1,13 @@
 package mock
 
-import "github.com/GregoryAlbouy/shrinker/internal"
+import (
+	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
+)
 
-// Users is a slice of internal.User.
+// users is a slice of internal.User.
 // Some have an AvatarURL, others don't.
-var Users = []internal.User{
+var users = []*internal.User{
 	{
 		ID:        1,
 		Username:  "Bret",
@@ -69,4 +72,15 @@ var Users = []internal.User{
 		Password:  "password",
 		AvatarURL: "https://cdn.goshrink.com/avatars/10/xxx.jpg",
 	},
+}
+
+func GetUsersWithHashedPasswords() ([]*internal.User, error) {
+	for _, v := range users {
+		hash, err := crypto.HashPassword(v.Password)
+		if err != nil {
+			return nil, err
+		}
+		v.Password = hash
+	}
+	return users, nil
 }

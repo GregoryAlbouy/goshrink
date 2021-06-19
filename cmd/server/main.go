@@ -54,7 +54,7 @@ func run(envPath string, migrate bool, verbose bool) error {
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
 	q, err := amqp.Dial(env["QUEUE_URL"])
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("rabbitmq error: %s", err)
 	}
 	defer q.Close()
 
@@ -91,7 +91,10 @@ func mustInitDatabase() *database.DB {
 
 func migrateMockUsers(db *database.DB) {
 	userService := database.NewUserService(db)
-	users := mock.Users
+	users, err := mock.GetUsersWithHashedPasswords()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err := userService.Migrate(users); err != nil {
 		log.Fatal(err)
 	}
