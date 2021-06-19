@@ -21,7 +21,7 @@ func (p *Producer) start() error {
 	return nil
 }
 
-// Publish a message to the AMQP exchange.
+// Publish a message to the queue.
 func (p *Producer) Publish(msg []byte) error {
 	ch, err := p.conn.Channel()
 	if err != nil {

@@ -20,7 +20,8 @@ func (c *Consumer) start() error {
 	return nil
 }
 
-// Listen listens for all new Queue messages and prints them to the console.
+// Listen starts listening for messages on the queue and runs the given job
+// for each each new message received.
 func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	ch, err := c.conn.Channel()
 	if err != nil {
