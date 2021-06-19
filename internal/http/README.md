@@ -45,6 +45,22 @@ Response:
 201 Created
 ```
 
+### Login
+
+Request:
+
+```sh
+curl -X POST -H "Content-Type: application/json" -d '{"username": "user", "password": "pkEfkV39Bs"}' http://localhost:9999/login
+```
+
+Response:
+
+```json
+{
+  "token": "string"
+}
+```
+
 ### Upload an avatar
 
 Request:

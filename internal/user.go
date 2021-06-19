@@ -26,6 +26,9 @@ type UserService interface {
 	// FindByID retrieves a user by its ID.
 	FindByID(id int) (User, error)
 
+	// FindCreds retrieves a user credentials by its username.
+	FindCreds(username string) (User, error)
+
 	// SetAvatarURL assigns to a user's avatar field the given avatar URL.
 	SetAvatarURL(userID int, url string) error
 

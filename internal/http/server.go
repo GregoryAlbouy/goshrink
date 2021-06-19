@@ -63,6 +63,7 @@ func (s *Server) Start() error {
 func (s *Server) registerAllRoutes() {
 	s.router.HandleFunc("/", s.handleIndex)
 
+	s.registerAuthRoutes()
 	s.registerUserRoutes()
 	s.registerAvatarRoutes()
 }
