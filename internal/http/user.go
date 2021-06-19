@@ -1,9 +1,11 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
 )
 
 // registerUserRoutes is a helper function for registering all user routes.
@@ -40,6 +42,14 @@ func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}
+
+	// Do not store password as plain text.
+	hashedPwd, err := crypto.HashPassword(u.Password)
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest.Wrap(errors.New("invalid password")))
+		return
+	}
+	u.Password = hashedPwd
 
 	if err := s.UserService.InsertOne(*u); err != nil {
 		respondHTTPError(w, ErrInternal)
