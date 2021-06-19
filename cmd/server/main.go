@@ -8,12 +8,16 @@ import (
 	"github.com/GregoryAlbouy/shrinker/internal/http"
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
+	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/streadway/amqp"
 )
 
 const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
+	"QUEUE_URL":           "",
+	"QUEUE_NAME":          "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
 	"MYSQL_DOMAIN":        "",
@@ -47,7 +51,20 @@ func run(envPath string, migrate bool, verbose bool) error {
 		migrateMockUsers(db)
 	}
 
-	srv := initServer(db, verbose)
+	// Connect to the queue as close to main as possible, as we are usign `defer`.
+	q, err := amqp.Dial(env["QUEUE_URL"])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer q.Close()
+
+	queue.SetQueueName(env["QUEUE_NAME"])
+
+	srv, err := initServer(db, q, verbose)
+	if err != nil {
+		return err
+	}
+
 	if err := srv.Start(); err != nil {
 		return err
 	}
@@ -80,11 +97,11 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, verbose bool) *http.Server {
+func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server, error) {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
 
-	return http.NewServer(addr, repo, verbose)
+	return http.NewServer(addr, repo, q, verbose)
 }

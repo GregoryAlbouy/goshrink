@@ -1,6 +1,8 @@
 package http
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
@@ -24,11 +26,16 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// There is no use for the user id for now. It will be passed to the queue.
-	_, err = extractID(r)
+	id, err := extractID(r)
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
+	}
+
+	msg := new(bytes.Buffer)
+	msg.ReadFrom(file)
+	if err = s.imageQueue.Publish(msg.Bytes(), fmt.Sprint(id)); err != nil {
+		respondHTTPError(w, ErrInternal.Wrap(err))
 	}
 
 	respondJSON(w, 202, "Accepted\n")

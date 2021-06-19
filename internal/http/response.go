@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -18,7 +17,6 @@ func respondJSON(w http.ResponseWriter, code int, data interface{}) {
 
 	resp, err := json.Marshal(data)
 	if err != nil {
-		fmt.Printf("RespondJSON: %T error: %v\n", err, err)
 		respondHTTPError(w, ErrInternal)
 		return
 	}

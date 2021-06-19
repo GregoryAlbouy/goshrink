@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -31,7 +30,7 @@ func main() {
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 
-	fmt.Printf("Server listening at http://localhost%s\n", addr)
+	log.Printf("Server listening at http://localhost%s\n", addr)
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
