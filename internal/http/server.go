@@ -14,7 +14,7 @@ type Server struct {
 	*http.Server
 	router *mux.Router
 	Repository
-	producer queue.Producer
+	uploadQueue queue.Producer
 }
 
 // Repository exposes the available operations to access the data layer.
@@ -24,8 +24,8 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, conn *amqp.Connection, verbose bool) (*Server, error) {
-	prod, err := queue.NewProducer(conn, verbose)
+func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (*Server, error) {
+	prod, err := queue.NewProducer(q, verbose)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func NewServer(addr string, repo Repository, conn *amqp.Connection, verbose bool
 		Repository: Repository{
 			UserService: repo.UserService,
 		},
-		producer: prod,
+		uploadQueue: prod,
 	}
 
 	if verbose {

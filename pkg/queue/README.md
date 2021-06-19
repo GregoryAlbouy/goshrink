@@ -7,9 +7,9 @@ The package `queue` defines the queue's implementation. It exposes `Producer` an
 To use a named queue, you must invoke and pass your queue name to `SetQueueName` before calling `Producer.Publish` or
 `Consumer.Listen`.
 
-## Get the connection
+## Open the connection
 
-Whether you are using `queue` with a `Consumer` or a `Producer`, you first need to open a connection.
+Whether you are using `queue` with a `Consumer` or a `Producer`, you first need to open and retrieve a connection.
 
 ```go
 conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")

@@ -52,15 +52,15 @@ func run(envPath string, migrate bool, verbose bool) error {
 	}
 
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
-	conn, err := amqp.Dial(env["QUEUE_URL"])
+	q, err := amqp.Dial(env["QUEUE_URL"])
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer q.Close()
 
 	queue.SetQueueName(env["QUEUE_NAME"])
 
-	srv, err := initServer(db, conn, verbose)
+	srv, err := initServer(db, q, verbose)
 	if err != nil {
 		return err
 	}
@@ -97,11 +97,11 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, conn *amqp.Connection, verbose bool) (*http.Server, error) {
+func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server, error) {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
 
-	return http.NewServer(addr, repo, conn, verbose)
+	return http.NewServer(addr, repo, q, verbose)
 }

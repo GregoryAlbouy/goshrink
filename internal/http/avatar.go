@@ -34,7 +34,7 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 
 	msg := new(bytes.Buffer)
 	msg.ReadFrom(file)
-	if err = s.producer.Publish(msg.Bytes(), fmt.Sprint(id)); err != nil {
+	if err = s.uploadQueue.Publish(msg.Bytes(), fmt.Sprint(id)); err != nil {
 		respondHTTPError(w, ErrInternal.Wrap(err))
 	}
 
