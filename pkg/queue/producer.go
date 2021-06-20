@@ -54,6 +54,10 @@ func (p *Producer) Publish(msg []byte, id string) error {
 	return nil
 }
 
+func (p Producer) CloseConnection() error {
+	return p.conn.Close()
+}
+
 func NewProducer(conn *amqp.Connection) (Producer, error) {
 	producer := Producer{
 		conn: conn,
