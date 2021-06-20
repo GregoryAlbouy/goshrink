@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/gorilla/mux"
 	"github.com/streadway/amqp"
@@ -24,8 +25,8 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (*Server, error) {
-	prod, err := queue.NewProducer(q, verbose)
+func NewServer(addr string, repo Repository, q *amqp.Connection) (*Server, error) {
+	prod, err := queue.NewProducer(q)
 	if err != nil {
 		return nil, err
 	}
@@ -39,9 +40,7 @@ func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (
 		imageQueue: prod,
 	}
 
-	if verbose {
-		s.router.Use(requestLogger)
-	}
+	s.router.Use(httplog.RequestLogger)
 
 	s.registerAllRoutes()
 	s.Handler = s.router
@@ -71,12 +70,4 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text-plain")
 	w.WriteHeader(200)
 	w.Write([]byte("Hello World!"))
-}
-
-// requestLogger middleware logs all endpoint calls to the standard output.
-func requestLogger(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL.String())
-		h.ServeHTTP(w, r)
-	})
 }
