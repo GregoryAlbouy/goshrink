@@ -25,19 +25,19 @@ start-queue:
 
 .PHONY: start-server
 start-server:
-	@go run cmd/server/main.go -v
+	@go run cmd/server/main.go
 
 .PHONY: start-server-migrate
 start-server-migrate:
-	@go run cmd/server/main.go -v -m
+	@go run cmd/server/main.go -m
 
 .PHONY: start-static
 start-static:
-	@go run $$(ls -1 ./cmd/static/*.go | grep -v _test.go)
+	@go run $$(ls -1 ./cmd/static/*.go | grep _test.go)
 
 .PHONY: start-worker
 start-worker:
-	@go run $$(ls -1 ./cmd/worker/*.go | grep -v _test.go)
+	@go run $$(ls -1 ./cmd/worker/*.go | grep _test.go)
 
 .phony: post-guest
 post-guest:
@@ -50,7 +50,7 @@ post-avatar:
 
 .PHONY: test
 test:
-	@go test -v -timeout 30s -run ${t} ./...
+	@go test -timeout 30s -run ${t} ./...
 
 .PHONY: tests
 tests:
