@@ -12,22 +12,30 @@ type ResponseWriter struct {
 	Status int // Records the status code of the request.
 }
 
-func (lr *ResponseWriter) WriteHeader(statusCode int) {
-	lr.Status = statusCode
-	lr.ResponseWriter.WriteHeader(statusCode)
+func (rw *ResponseWriter) Header() http.Header {
+	return rw.ResponseWriter.Header()
+}
+
+func (rw *ResponseWriter) WriteHeader(statusCode int) {
+	rw.Status = statusCode
+	rw.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (rw *ResponseWriter) Write(data []byte) (int, error) {
+	return rw.ResponseWriter.Write(data)
 }
 
 // RequestLogger adds logging to the given http.Handler.
 func RequestLogger(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		lr := &ResponseWriter{
+		rw := &ResponseWriter{
 			ResponseWriter: w,
 			Status:         http.StatusOK,
 		}
 
-		c := statusColor(lr.Status)
+		h.ServeHTTP(rw, r)
 
-		defer log.Printf("%s %s -> %s %s", r.Method, r.URL.String(), c(lr.Status), c(http.StatusText(lr.Status)))
-		h.ServeHTTP(lr, r)
+		c := statusColor(rw.Status)
+		log.Printf("%s %s -> %s %s", r.Method, r.URL.String(), c(rw.Status), c(http.StatusText(rw.Status)))
 	})
 }

@@ -3,8 +3,9 @@ package httplog
 import "fmt"
 
 var (
-	Green = color("\033[1;32m%s\033[0m")
-	Red   = color("\033[1;31m%s\033[0m")
+	Green  = color("\033[1;32m%s\033[0m")
+	Red    = color("\033[1;31m%s\033[0m")
+	Yellow = color("\033[1;33m%s\033[0m")
 )
 
 func color(a string) func(...interface{}) string {
@@ -15,8 +16,15 @@ func color(a string) func(...interface{}) string {
 }
 
 func statusColor(statusCode int) func(...interface{}) string {
-	if statusCode <= 400 {
-		return Green
+	// Success & redirection
+	c := Green
+	// Client error
+	if statusCode >= 400 {
+		c = Yellow
 	}
-	return Red
+	// Server error
+	if statusCode >= 500 {
+		c = Red
+	}
+	return c
 }
