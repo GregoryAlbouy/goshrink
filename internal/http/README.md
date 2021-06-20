@@ -75,5 +75,3 @@ Response:
 ```txt
 202 Accepted
 ```
-
-> Note: this endpoint will require the user to be authenticated in the future.
