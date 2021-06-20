@@ -29,7 +29,7 @@ type Config struct {
 // It panics in case of error, which is acceptable here as it is called
 // before the server starts.
 func (db *DB) MustInit(cfg Config) {
-	db.mustConnect(cfg)
+	db.MustConnect(cfg)
 	db.mustCreateDatabase(cfg.Database)
 	db.mustCreateTables()
 }
@@ -42,12 +42,13 @@ func (db *DB) Close() error {
 
 // mustConnect makes the connection to the mysql server.
 // It panics in case of error.
-func (db *DB) mustConnect(cfg Config) {
+func (db *DB) MustConnect(cfg Config) {
 	dsn := fmt.Sprintf(
 		dsnFormat,
 		cfg.User, cfg.Password, cfg.Domain, cfg.Port,
 	)
 	sqlx := sqlx.MustConnect(dbSystem, dsn)
+	sqlx.MustExec("USE " + cfg.Database)
 	db.sqlx = sqlx
 }
 
