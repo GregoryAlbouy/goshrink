@@ -49,7 +49,7 @@ func (p *Producer) Publish(msg []byte, id string) error {
 		return err
 	}
 
-	log.Printf("message -> %s", q.Name)
+	log.Printf("Sending message -> %s", q.Name)
 	return nil
 }
 
