@@ -10,14 +10,13 @@ type Producer struct {
 	conn *amqp.Connection
 }
 
-func (p *Producer) start() error {
+// ping makes sure that the queue the producer sends messages to exists.
+func (p *Producer) ping() error {
 	ch, err := p.conn.Channel()
 	if err != nil {
 		return err
 	}
-
-	defer ch.Close()
-	return nil
+	return ch.Close()
 }
 
 // Publish a message to the queue. id is an arbitrary identifier for the message.
@@ -62,7 +61,7 @@ func NewProducer(conn *amqp.Connection) (Producer, error) {
 	producer := Producer{
 		conn: conn,
 	}
-	if err := producer.start(); err != nil {
+	if err := producer.ping(); err != nil {
 		return Producer{}, err
 	}
 	return producer, nil
