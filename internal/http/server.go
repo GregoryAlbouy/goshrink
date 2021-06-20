@@ -8,7 +8,6 @@ import (
 	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/gorilla/mux"
-	"github.com/streadway/amqp"
 )
 
 type Server struct {
@@ -25,19 +24,14 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, q *amqp.Connection) (*Server, error) {
-	prod, err := queue.NewProducer(q)
-	if err != nil {
-		return nil, err
-	}
-
+func NewServer(addr string, repo Repository, qp queue.Producer) (*Server, error) {
 	s := &Server{
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
 		Repository: Repository{
 			UserService: repo.UserService,
 		},
-		imageQueue: prod,
+		imageQueue: qp,
 	}
 
 	s.router.Use(httplog.RequestLogger)

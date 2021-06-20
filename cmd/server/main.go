@@ -51,15 +51,15 @@ func run(envPath string, migrate bool) error {
 	}
 
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
-	q, err := amqp.Dial(env["QUEUE_URL"])
+	qp, err := initQueue()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer q.Close()
+	defer qp.CloseConnection()
 
 	queue.SetQueueName(env["QUEUE_NAME"])
 
-	srv, err := initServer(db, q)
+	srv, err := initServer(db, qp)
 	if err != nil {
 		return err
 	}
@@ -84,8 +84,26 @@ func mustInitDatabase() *database.DB {
 	}
 
 	db.MustInit(cfg)
-
+	log.Printf("Server connected to database %s", env["MYSQL_DATABASE"])
 	return db
+}
+
+// initQueue connects and initializes the queue.
+func initQueue() (queue.Producer, error) {
+	conn, err := amqp.Dial(env["QUEUE_URL"])
+	if err != nil {
+		return queue.Producer{}, err
+	}
+
+	queue.SetQueueName(env["QUEUE_NAME"])
+
+	producer, err := queue.NewProducer(conn)
+	if err != nil {
+		return queue.Producer{}, err
+	}
+
+	log.Printf("Server connected to queue %s", env["QUEUE_NAME"])
+	return producer, nil
 }
 
 func migrateMockUsers(db *database.DB) {
@@ -96,11 +114,11 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, q *amqp.Connection) (*http.Server, error) {
+func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
 
-	return http.NewServer(addr, repo, q)
+	return http.NewServer(addr, repo, qp)
 }
