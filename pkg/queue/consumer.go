@@ -73,6 +73,10 @@ func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	return nil
 }
 
+func (c *Consumer) CloseConnection() error {
+	return c.conn.Close()
+}
+
 func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	consumer := Consumer{
 		conn: conn,
