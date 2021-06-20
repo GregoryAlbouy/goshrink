@@ -57,7 +57,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
-	return (func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := authtoken.BearerToken(r)
 		if err != nil {
 			respondHTTPError(w, ErrUnauthorized)
