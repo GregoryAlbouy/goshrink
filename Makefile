@@ -25,11 +25,11 @@ start-queue:
 
 .PHONY: start-server
 start-server:
-	@go run cmd/server/main.go -v
+	@go run cmd/server/main.go
 
 .PHONY: start-server-migrate
 start-server-migrate:
-	@go run cmd/server/main.go -v -m
+	@go run cmd/server/main.go -m
 
 .PHONY: start-static
 start-static:
