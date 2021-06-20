@@ -3,9 +3,9 @@ package database
 const userSchema = `
 CREATE TABLE IF NOT EXISTS user (
 	id INT UNSIGNED AUTO_INCREMENT,
-	username VARCHAR(20),
+	username VARCHAR(20) UNIQUE,
 	password VARCHAR(255),
-	email VARCHAR(255),
+	email VARCHAR(255) UNIQUE,
 	PRIMARY KEY (id)
 )
 `
