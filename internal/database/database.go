@@ -25,7 +25,7 @@ type Config struct {
 	Database string
 }
 
-// MUstInit connects to the database and creates the base database and tables.
+// MustInit connects to the database and creates the base database and tables.
 // It panics in case of error, which is acceptable here as it is called
 // before the server starts.
 func (db *DB) MustInit(cfg Config) {
