@@ -25,8 +25,8 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (*Server, error) {
-	prod, err := queue.NewProducer(q, verbose)
+func NewServer(addr string, repo Repository, q *amqp.Connection) (*Server, error) {
+	prod, err := queue.NewProducer(q)
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +40,7 @@ func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (
 		imageQueue: prod,
 	}
 
-	if verbose {
-		s.router.Use(httplog.RequestLogger)
-	}
+	s.router.Use(httplog.RequestLogger)
 
 	s.registerAllRoutes()
 	s.Handler = s.router

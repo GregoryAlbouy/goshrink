@@ -7,8 +7,7 @@ import (
 )
 
 type Producer struct {
-	conn    *amqp.Connection
-	verbose bool
+	conn *amqp.Connection
 }
 
 func (p *Producer) start() error {
@@ -51,17 +50,13 @@ func (p *Producer) Publish(msg []byte, id string) error {
 		return err
 	}
 
-	if p.verbose {
-		log.Printf("message -> %s", q.Name)
-	}
-
+	log.Printf("message -> %s", q.Name)
 	return nil
 }
 
-func NewProducer(conn *amqp.Connection, verbose bool) (Producer, error) {
+func NewProducer(conn *amqp.Connection) (Producer, error) {
 	producer := Producer{
-		conn:    conn,
-		verbose: verbose,
+		conn: conn,
 	}
 	if err := producer.start(); err != nil {
 		return Producer{}, err

@@ -27,17 +27,16 @@ var env = map[string]string{
 
 func main() {
 	migrate := flag.Bool("m", false, "use mock users")
-	verbose := flag.Bool("v", false, "verbose mode")
 	flag.Parse()
 
 	envPath := dotenv.GetPath(defaultEnvPath)
 
-	if err := run(envPath, *migrate, *verbose); err != nil {
+	if err := run(envPath, *migrate); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(envPath string, migrate bool, verbose bool) error {
+func run(envPath string, migrate bool) error {
 	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
 	}
@@ -60,7 +59,7 @@ func run(envPath string, migrate bool, verbose bool) error {
 
 	queue.SetQueueName(env["QUEUE_NAME"])
 
-	srv, err := initServer(db, q, verbose)
+	srv, err := initServer(db, q)
 	if err != nil {
 		return err
 	}
@@ -97,11 +96,11 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server, error) {
+func initServer(db *database.DB, q *amqp.Connection) (*http.Server, error) {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
 
-	return http.NewServer(addr, repo, q, verbose)
+	return http.NewServer(addr, repo, q)
 }
