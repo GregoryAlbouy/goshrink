@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -12,13 +13,15 @@ import (
 // handleImageUpload handles requests to upload an image to the server.
 // The uploaded image is save on the disk if the request is accepted.
 func handleImageUpload(w http.ResponseWriter, r *http.Request) {
+	log.Println("got upload request")
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Retrieve the file
-	file, headers, err := r.FormFile("upload")
+	file, headers, err := r.FormFile("image")
 	if err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
@@ -34,7 +37,7 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	file.Seek(0, io.SeekStart)
 
 	// Create a destination on disk
-	dst, err := os.OpenFile(getFilepath(headers.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	dst, err := os.OpenFile(buildFilepath(headers.Filename), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		http.Error(w, "internal error: failed to create file", http.StatusInternalServerError)
 		return
@@ -51,8 +54,8 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Created\n"))
 }
 
-// getFilepath efficiently builds a filepath string from the given filename.
-func getFilepath(filename string) string {
+// buildFilepath efficiently builds a filepath string from the given filename.
+func buildFilepath(filename string) string {
 	var sb strings.Builder
 	parts := []string{env["STATIC_FILE_PATH"], "/", filename}
 	for _, v := range parts {

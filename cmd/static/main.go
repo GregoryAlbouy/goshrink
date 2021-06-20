@@ -30,7 +30,7 @@ func main() {
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 
-	log.Printf("Server listening at http://localhost%s\n", addr)
+	log.Printf("Static server listening at http://localhost%s\n", addr)
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)

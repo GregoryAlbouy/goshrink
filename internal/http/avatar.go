@@ -14,7 +14,7 @@ func (s *Server) registerAvatarRoutes() {
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("upload")
+	file, _, err := r.FormFile("image")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return

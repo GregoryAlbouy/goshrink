@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
@@ -20,12 +19,16 @@ var env = map[string]string{
 	"MYSQL_DATABASE":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
+	"STATIC_SERVER_KEY":   "",
+	"STATIC_SERVER_URL":   "",
 }
 
 func main() {
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
+
+	// todo: flags
 }
 
 func run() error {
@@ -47,10 +50,10 @@ func run() error {
 	defer db.Close()
 
 	// handle queue messages
-	h := queueHandler{
+	h := messageHandler{
 		userService: database.NewUserService(db),
 	}
-	return qc.Listen(h.handleMessage)
+	return qc.Listen(h.handle)
 }
 
 func initDatabase() *database.DB {
@@ -60,11 +63,11 @@ func initDatabase() *database.DB {
 		Password: env["MYSQL_ROOT_PASSWORD"],
 		Domain:   env["MYSQL_DOMAIN"],
 		Port:     env["MYSQL_PORT"],
-		Database: env["MYSQL°DATABASE"],
+		Database: env["MYSQL_DATABASE"],
 	}
 
 	db.MustConnect(cfg)
-	fmt.Println("Worker successfully connected to database")
+	log.Printf("Worker connected to database %s", env["MYSQL_DATABASE"])
 	return db
 }
 
@@ -81,6 +84,6 @@ func initQueue() (queue.Consumer, error) {
 		return queue.Consumer{}, err
 	}
 
-	fmt.Println("Worker successfully connected to queue")
+	log.Println("Worker connected to queue")
 	return consumer, nil
 }
