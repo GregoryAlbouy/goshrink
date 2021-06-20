@@ -27,11 +27,11 @@ jobs:
 
       # Run Go unit tests
       - name: Test
-        run: go test ./...
+        run: go test -v ./...
 
       # Build
       - name: Build Server
-        run: go build ./cmd/server/main.go
+        run: go build -v ./cmd/server/main.go
 
       - name: Build Worker
-        run: go build $(ls -1 ./cmd/worker/*.go | grep _test.go)
+        run: go build -v $(ls -1 ./cmd/worker/*.go | grep -v _test.go)
