@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/gorilla/mux"
 	"github.com/streadway/amqp"
@@ -40,7 +41,7 @@ func NewServer(addr string, repo Repository, q *amqp.Connection, verbose bool) (
 	}
 
 	if verbose {
-		s.router.Use(requestLogger)
+		s.router.Use(httplog.RequestLogger)
 	}
 
 	s.registerAllRoutes()
@@ -71,12 +72,4 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text-plain")
 	w.WriteHeader(200)
 	w.Write([]byte("Hello World!"))
-}
-
-// requestLogger middleware logs all endpoint calls to the standard output.
-func requestLogger(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL.String())
-		h.ServeHTTP(w, r)
-	})
 }
