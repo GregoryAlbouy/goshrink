@@ -56,8 +56,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}{token})
 }
 
-func (s *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := authtoken.BearerToken(r)
 		if err != nil {
 			respondHTTPError(w, ErrUnauthorized)
@@ -87,8 +87,8 @@ func (s *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		ctx := context.WithValue(r.Context(), UserKey, &u)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+		hf(w, r.WithContext(ctx))
+	}
 }
 
 func userFromContext(ctx context.Context) *internal.User {
