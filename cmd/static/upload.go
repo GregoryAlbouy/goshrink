@@ -48,7 +48,6 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal error: failed to copy file", http.StatusInternalServerError)
 		return
 	}
-
 	fileURL := buildFileURL(filepath)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fileURL))
@@ -56,18 +55,18 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 
 // buildFilepath efficiently builds a filepath string from the given filename.
 func buildFilepath(filename string) string {
-	var sb strings.Builder
 	parts := []string{env["STATIC_FILE_PATH"], "/", filename}
-	for _, v := range parts {
-		sb.WriteString(v)
-	}
-	return sb.String()
+	return buildString(parts...)
 }
 
 // buildFileURL efficiently builds a file URL string from the given filepath.
 func buildFileURL(filepath string) string {
-	var sb strings.Builder
 	parts := []string{"http://localhost", ":", env["STATIC_SERVER_PORT"], "/", filepath}
+	return buildString(parts...)
+}
+
+func buildString(parts ...string) string {
+	var sb strings.Builder
 	for _, v := range parts {
 		sb.WriteString(v)
 	}
