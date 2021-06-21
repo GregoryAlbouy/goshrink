@@ -9,7 +9,6 @@ import (
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
-	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/streadway/amqp"
 )
 
@@ -125,7 +124,5 @@ func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
 		UserService: database.NewUserService(db),
 	}
 
-	simplejwt.SetSecretKey([]byte(env["API_JWT_SECRET"]))
-
-	return http.NewServer(addr, repo, qp)
+	return http.NewServer(addr, repo, qp, env["API_JWT_SECRET"])
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/internal"
 	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/gorilla/mux"
 )
 
@@ -24,7 +25,7 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, qp queue.Producer) (*Server, error) {
+func NewServer(addr string, repo Repository, qp queue.Producer, secretKey string) (*Server, error) {
 	s := &Server{
 		Server: &http.Server{Addr: addr},
 		router: mux.NewRouter().StrictSlash(true),
@@ -38,6 +39,8 @@ func NewServer(addr string, repo Repository, qp queue.Producer) (*Server, error)
 
 	s.registerAllRoutes()
 	s.Handler = s.router
+
+	simplejwt.SetSecretKey([]byte(secretKey))
 
 	return s, nil
 }

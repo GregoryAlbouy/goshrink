@@ -31,8 +31,6 @@ func newToken(claims BaseClaims) *jwt.Token {
 }
 
 // signToken returns the signed string from the given token.
-//
-// It panics if a secret key was not provided beforehand via SetSecretKey.
 func signToken(token *jwt.Token) (string, error) {
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
@@ -53,8 +51,6 @@ func NewSignedToken(claims BaseClaims) (string, error) {
 
 // VerifiedToken parses, validates and returns a token given a string.
 // Claims are then accessible for validation and use.
-//
-// It panics if a secret key was not provided beforehand via SetSecretKey.
 func VerifiedToken(tokenString string) (*jwt.Token, error) {
 	// This method will return an error if the token is invalid
 	// or if the signature does not match.
