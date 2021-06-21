@@ -2,15 +2,14 @@ package http
 
 import (
 	"fmt"
+	"net/http"
 )
 
 var (
-	ErrBadRequest          = &HTTPError{400, "bad request", nil}
-	ErrUnauthorized        = &HTTPError{401, "unauthorized", nil}
-	ErrForbidden           = &HTTPError{403, "forbidden", nil}
-	ErrNotFound            = &HTTPError{404, "not found", nil}
-	ErrUnprocessableEntity = &HTTPError{422, "validation error", nil}
-	ErrInternal            = &HTTPError{500, "internal error", nil}
+	ErrBadRequest   = &HTTPError{http.StatusBadRequest, http.StatusText(http.StatusBadRequest), nil}
+	ErrUnauthorized = &HTTPError{http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized), nil}
+	ErrNotFound     = &HTTPError{http.StatusNotFound, http.StatusText(http.StatusNotFound), nil}
+	ErrInternal     = &HTTPError{http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), nil}
 )
 
 type HTTPError struct {
