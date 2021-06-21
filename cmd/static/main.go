@@ -23,10 +23,10 @@ func main() {
 	}
 
 	fs := http.Dir(env["STATIC_FILE_PATH"])
-	// GET /static/<filename>
-	http.Handle("/static/", httplog.RequestLogger(handleFileServe("/static", fs)))
-	// POST /static/avatar
-	http.HandleFunc("/static/avatar", httplog.RequestLogger(requireAPIKey(handleImageUpload)).ServeHTTP)
+	// GET /storage/<filename>
+	http.Handle("/storage/", httplog.RequestLogger(handleFileServe("/storage", fs)))
+	// POST /storage/avatar
+	http.Handle("/storage/avatar", httplog.RequestLogger(requireAPIKey(handleImageUpload)))
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 

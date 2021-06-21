@@ -96,7 +96,7 @@ func (h messageHandler) postImageToStorage(d multipartFormData) (string, error) 
 	writer.Close()
 
 	// Build HTTP request
-	url := env["STATIC_SERVER_URL"] + "/static/avatar"
+	url := env["STATIC_SERVER_URL"] + "/storage/avatar"
 	request, err := http.NewRequest("POST", url, &body)
 	if err != nil {
 		return "", err
