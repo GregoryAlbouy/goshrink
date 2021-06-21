@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
 	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 )
 
@@ -22,8 +22,7 @@ type Creds struct {
 type ContextKey string
 
 const (
-	userKey      ContextKey = "user"
-	bearerScheme string     = "Bearer "
+	userKey ContextKey = "user"
 )
 
 func (s *Server) registerAuthRoutes() {
@@ -61,12 +60,11 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		a := r.Header.Get("Authorization")
-		if !strings.HasPrefix(a, bearerScheme) {
-			respondHTTPError(w, ErrUnauthorized)
+		tokenString, err := httputil.BearerToken(r)
+		if err != nil {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		tokenString := strings.TrimPrefix(a, bearerScheme)
 
 		token, err := simplejwt.VerifiedToken(tokenString)
 		if err != nil {

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
 )
 
@@ -71,19 +72,13 @@ func buildString(parts ...string) string {
 	return sb.String()
 }
 
-// bearer represents the string prefixing the authorization key contained in
-// the authorization headers: "Bearer <key>".
-const bearer = "Bearer "
-
 func requireAPIKey(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		v := r.Header.Get("Authorization")
-		if !strings.HasPrefix(v, bearer) {
+		key, err := httputil.BearerToken(r)
+		if err != nil {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-
-		key := strings.TrimPrefix(v, bearer)
 
 		if key != env["STATIC_SERVER_KEY"] {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)

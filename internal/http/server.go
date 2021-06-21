@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/gorilla/mux"
@@ -35,7 +35,7 @@ func NewServer(addr string, repo Repository, qp queue.Producer, secretKey string
 		imageQueue: qp,
 	}
 
-	s.router.Use(httplog.RequestLogger)
+	s.router.Use(httputil.RequestLogger)
 
 	s.registerAllRoutes()
 	s.Handler = s.router
