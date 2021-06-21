@@ -24,26 +24,25 @@ const (
 	PNGExt  Ext = ".png"
 )
 
-// FormatExt associates a file extension to a Format
+// FormatExt maps a file extension to a Format.
 var FormatExt = map[Format]Ext{
 	JPEGFormat: JPEGExt,
 	PNGFormat:  PNGExt,
 }
 
-// DecodeRaw decodes a series of bytes and returns an image.Image
-// or a non-nil error.
+// DecodeRaw tries to decode and return a series of bytes as an image.
 func DecodeRaw(rawFile []byte) (image.Image, error) {
 	r := bytes.NewReader(rawFile)
 	return imaging.Decode(r)
 }
 
-// Encode encodes an *image.NRGBA to a []byte and returns an error.
+// Encode encodes an *image.NRGBA as bytes. Returns any error occurring
+// during the process.
 func Encode(w io.Writer, img *image.NRGBA, fmt Format) error {
 	return imaging.Encode(w, img, imaging.Format(fmt))
 }
 
-// Reader encodes an *image.NRGBA and returns a new file reader
-// or a non-nil error.
+// Reader encodes an *image.NRGBA and returns it as a new io.Reader.
 func Reader(img *image.NRGBA, fmt Format) (io.Reader, error) {
 	buf := bytes.Buffer{}
 
@@ -53,7 +52,8 @@ func Reader(img *image.NRGBA, fmt Format) (io.Reader, error) {
 	return bytes.NewReader(buf.Bytes()), nil
 }
 
-// Rescale sets an image width to the given value, preserving the aspect ratio.
+// Rescale sets an image width to the given value, preserving its aspect ratio.
+// Returns the modified image.
 func Rescale(img image.Image, width int) *image.NRGBA {
 	return imaging.Resize(img, width, 0, imaging.NearestNeighbor)
 }

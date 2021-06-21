@@ -15,19 +15,29 @@ import (
 	"github.com/streadway/amqp"
 )
 
+// multipartFormData represents the necessary data for creating
+// a new request with content type "multipart/form-data".
 type multipartFormData struct {
 	userID   string
 	filename string
 	file     io.Reader
 }
 
+// messageHandler represents a service to handle
+// incoming messages from the queue.
 type messageHandler struct {
 	userService internal.UserService
 }
 
 // handle runs the full worker job process.
 //
+// It parses messages from the queue and invokes the resizing function on
+// the file held inside. It then posts to the storage the modified image
+// will all the data needed using "multipart/form-data" content type.
+// Upon receiving confirmation of the creation of the file storage side,
+// it writes the newly created file URL to the database.
 //
+// Any error during the process will is caught and returned to the caller.
 func (h messageHandler) handle(d amqp.Delivery) error {
 	log.Printf("Start handling message %d...", d.DeliveryTag)
 
@@ -52,17 +62,17 @@ func (h messageHandler) handle(d amqp.Delivery) error {
 		file:     imageReader,
 	}
 
-	avatarURL, err := h.postFileToStaticServer(data)
+	avatarURL, err := h.postImageToStorage(data)
 	if err != nil {
 		return err
 	}
 
-	return h.updateAvatarURLInDatabase(userID, avatarURL)
+	return h.writeURLToDatabase(userID, avatarURL)
 }
 
-// postFileToStaticServer makes a POST request to the static server.
-// It uses a Multipart/FormData to send the userID and the image file.
-func (h messageHandler) postFileToStaticServer(d multipartFormData) (string, error) {
+// postImageToStorage makes a POST request to the storage.
+// It sends a "multipart/form-data" request with the userID and the image file.
+func (h messageHandler) postImageToStorage(d multipartFormData) (string, error) {
 	body := bytes.Buffer{}
 	writer := multipart.NewWriter(&body)
 	defer writer.Close()
@@ -115,7 +125,7 @@ func (h messageHandler) postFileToStaticServer(d multipartFormData) (string, err
 	return string(content), nil
 }
 
-func (h messageHandler) updateAvatarURLInDatabase(userID, avatarURL string) error {
+func (h messageHandler) writeURLToDatabase(userID, avatarURL string) error {
 	id, err := strconv.Atoi(userID)
 	if err != nil {
 		return err

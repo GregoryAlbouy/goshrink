@@ -7,30 +7,22 @@ import (
 	"github.com/GregoryAlbouy/shrinker/pkg/imaging"
 )
 
-const (
-	imageFormat = imaging.PNGFormat // TODO: make it actionnable
-)
+const imageFormat = imaging.PNGFormat // TODO: make it actionnable
 
+// Rezise width used by the worker.
 var resizeWidth int
 
-// processImage executes the whole image processing logic.
-// It takes a slice of bytes in input, decodes it to an image,
-// performs the rescale, and finally return a reader to access
-// the resulting file along with the image file extension.
-// It returns a non-nil error if anything went wrong.
+// processImage runs the full image processing logic.
 //
-// FIXME: imaging.DecodeRaw produces an error
+// It decodes the bytes input into an image, performs the rescale and
+// returns a io.Reader to access the output file.
+// Also returns the file extension.
 func processImage(raw []byte) (io.Reader, imaging.Ext, error) {
-	// // temp debug
-	// log.Println("Processing image")
-
-	// Decode raw file
 	img, err := imaging.DecodeRaw(raw)
 	if err != nil {
 		return nil, "", fmt.Errorf("image decoding error: %w", err)
 	}
 
-	// Rescale
 	resized := imaging.Rescale(img, resizeWidth)
 
 	// Encode and retrieve a file reader
@@ -39,7 +31,7 @@ func processImage(raw []byte) (io.Reader, imaging.Ext, error) {
 		return nil, "", fmt.Errorf("image encoding error: %w", err)
 	}
 
-	// Get file extension
+	// Manually get file extension
 	ext := imaging.FormatExt[imageFormat]
 
 	return reader, ext, nil
