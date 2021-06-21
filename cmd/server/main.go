@@ -28,17 +28,16 @@ var env = map[string]string{
 
 func main() {
 	migrate := flag.Bool("m", false, "use mock users")
-	verbose := flag.Bool("v", false, "verbose mode")
 	flag.Parse()
 
 	envPath := dotenv.GetPath(defaultEnvPath)
 
-	if err := run(envPath, *migrate, *verbose); err != nil {
+	if err := run(envPath, *migrate); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(envPath string, migrate bool, verbose bool) error {
+func run(envPath string, migrate bool) error {
 	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
 	}
@@ -53,15 +52,15 @@ func run(envPath string, migrate bool, verbose bool) error {
 	}
 
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
-	q, err := amqp.Dial(env["QUEUE_URL"])
+	qp, err := initQueue()
 	if err != nil {
 		log.Fatalf("rabbitmq error: %s", err)
 	}
-	defer q.Close()
+	defer qp.CloseConnection()
 
 	queue.SetQueueName(env["QUEUE_NAME"])
 
-	srv, err := initServer(db, q, verbose)
+	srv, err := initServer(db, qp)
 	if err != nil {
 		return err
 	}
@@ -86,8 +85,26 @@ func mustInitDatabase() *database.DB {
 	}
 
 	db.MustInit(cfg)
-
+	log.Printf("Server connected to database %s", env["MYSQL_DATABASE"])
 	return db
+}
+
+// initQueue connects and initializes the queue.
+func initQueue() (queue.Producer, error) {
+	conn, err := amqp.Dial(env["QUEUE_URL"])
+	if err != nil {
+		return queue.Producer{}, err
+	}
+
+	queue.SetQueueName(env["QUEUE_NAME"])
+
+	producer, err := queue.NewProducer(conn)
+	if err != nil {
+		return queue.Producer{}, err
+	}
+
+	log.Printf("Server connected to queue %s", env["QUEUE_NAME"])
+	return producer, nil
 }
 
 func migrateMockUsers(db *database.DB) {
@@ -101,7 +118,7 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server, error) {
+func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
@@ -109,5 +126,5 @@ func initServer(db *database.DB, q *amqp.Connection, verbose bool) (*http.Server
 
 	simplejwt.SetSecretKey([]byte("63b98f9f3c2da8d7480c867357a225c0d5d7c131"))
 
-	return http.NewServer(addr, repo, q, verbose)
+	return http.NewServer(addr, repo, qp)
 }

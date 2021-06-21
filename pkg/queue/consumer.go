@@ -10,14 +10,13 @@ type Consumer struct {
 	conn *amqp.Connection
 }
 
-func (c *Consumer) start() error {
+// ping makes sure that the queue the consumer sends messages to exists.
+func (c *Consumer) ping() error {
 	ch, err := c.conn.Channel()
 	if err != nil {
 		return err
 	}
-
-	defer ch.Close()
-	return nil
+	return ch.Close()
 }
 
 // Listen starts listening for messages on the queue and runs the given job
@@ -61,10 +60,11 @@ func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	go func() {
 		for d := range msgs {
 			if err := job(d); err != nil {
-				log.Printf("error processing %d: %s", d.DeliveryTag, err)
+				log.Printf("error processing message (tag %d): %s", d.DeliveryTag, err)
 				d.Reject(false)
+			} else {
+				d.Ack(false)
 			}
-			d.Ack(false)
 		}
 	}()
 
@@ -73,11 +73,15 @@ func (c *Consumer) Listen(job func(d amqp.Delivery) error) error {
 	return nil
 }
 
+func (c *Consumer) CloseConnection() error {
+	return c.conn.Close()
+}
+
 func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	consumer := Consumer{
 		conn: conn,
 	}
-	if err := consumer.start(); err != nil {
+	if err := consumer.ping(); err != nil {
 		return Consumer{}, err
 	}
 	return consumer, nil

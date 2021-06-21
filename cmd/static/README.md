@@ -13,7 +13,7 @@ It is a public endpoint, anybody can retrieve and view a user's avatar.
 Request:
 
 ```sh
-curl -X GET http://localhost:9999/static/sample.png
+curl -X GET http://localhost:9999/storage/sample.png
 ```
 
 Response:
@@ -30,7 +30,7 @@ It a restricted route, only our worker can access it. It need to provide an API 
 Request:
 
 ```sh
-curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:8000/static/avatar
+curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:8000/storage/avatar
 ```
 
 Response:

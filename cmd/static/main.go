@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
+	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 )
 
 const defaultEnvPath = "./.env"
@@ -21,18 +22,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fs := http.Dir(env["STATIC_FILE_PATH"])
-
-	// GET /static/<filename>
-	http.Handle("/static/", handleFileServe("/static", fs))
-	// POST /static/avatar
-	http.HandleFunc("/static/avatar", requireAPIKey(handleImageUpload))
-
+	router := initRouter()
 	addr := ":" + env["STATIC_SERVER_PORT"]
+	log.Printf("Static server listening at http://localhost%s\n", addr)
 
-	log.Printf("Server listening at http://localhost%s\n", addr)
-
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := http.ListenAndServe(addr, httplog.RequestLogger(router)); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initRouter() *http.ServeMux {
+	router := http.NewServeMux()
+	fs := http.Dir(env["STATIC_FILE_PATH"])
+	// GET /storage/<filename>
+	router.Handle("/storage/", handleFileServe("/storage", fs))
+	// POST /storage/avatar
+	router.Handle("/storage/avatar", requireAPIKey(handleImageUpload))
+	return router
 }

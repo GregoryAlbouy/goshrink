@@ -7,18 +7,16 @@ import (
 )
 
 type Producer struct {
-	conn    *amqp.Connection
-	verbose bool
+	conn *amqp.Connection
 }
 
-func (p *Producer) start() error {
+// ping makes sure that the queue the producer sends messages to exists.
+func (p *Producer) ping() error {
 	ch, err := p.conn.Channel()
 	if err != nil {
 		return err
 	}
-
-	defer ch.Close()
-	return nil
+	return ch.Close()
 }
 
 // Publish a message to the queue. id is an arbitrary identifier for the message.
@@ -51,19 +49,19 @@ func (p *Producer) Publish(msg []byte, id string) error {
 		return err
 	}
 
-	if p.verbose {
-		log.Printf("message -> %s", q.Name)
-	}
-
+	log.Printf("Sending message -> %s", q.Name)
 	return nil
 }
 
-func NewProducer(conn *amqp.Connection, verbose bool) (Producer, error) {
+func (p Producer) CloseConnection() error {
+	return p.conn.Close()
+}
+
+func NewProducer(conn *amqp.Connection) (Producer, error) {
 	producer := Producer{
-		conn:    conn,
-		verbose: verbose,
+		conn: conn,
 	}
-	if err := producer.start(); err != nil {
+	if err := producer.ping(); err != nil {
 		return Producer{}, err
 	}
 	return producer, nil

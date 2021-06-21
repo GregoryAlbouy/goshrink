@@ -47,42 +47,55 @@ mkdir storage
 
 This project uses 3 executables and one instance of a message queue. You need to run them all at the same time.
 
-#### API server (and MySQL instance)
-
-```sh
-# alias to make docker && go run cmd/server/main.go
-make start
-```
-
-#### Static file server
-
-```sh
-go run ./cmd/static/*.go
-# or to bullet proof against any future test file:
-go run $(ls -1 ./cmd/static/*.go | grep -v _test.go)
-```
-
 #### Message queue
+
+The message queue must be up and running before anything else.
 
 ```sh
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
+#### API server
+
+```sh
+make start-server
+```
+
+#### Static file server
+
+```sh
+make start-static
+```
+
 #### Worker
 
 ```sh
-go run ./cmd/worker/main.go
+make start-worker
 ```
 
 ## Infrastructure
 
 ![infrastrucute schema](docs/infrastructure.svg)
 
-The 3 main applicative entities are the API server, the worker and the message broker:
+Each of the 5 entites above runs in a docker container.
 
-- the API simply interacts with the message broker and the database based on a client request
-- the message broker is in charge of asking the worker to start its job
-- the worker makes resquests to store files and can write in the database
+The 3 main applicative entities are the **API server**, the **worker** and the **message broker**.
+
+### The API server
+
+The API simply interacts with the message broker and the database based on a client request.
+
+### The message broker
+
+The message broker is in charge of asking the worker to start its job.
+
+It uses RabbitMQ.
+
+### The worker
+
+The worker makes resquests to store files and can write in the database.
+
+It leverages two customs modules, `queue` package built ontop of [streadway/amqp](https://github.com/streadway/amqp) and `imaging` wrapping [disintegration/imaging](https://github.com/disintegration/imaging) for image processing.
 
 ## Control flow
 
