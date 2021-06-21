@@ -34,7 +34,6 @@ func newToken(claims BaseClaims) *jwt.Token {
 //
 // It panics if a secret key was not provided beforehand via SetSecretKey.
 func signToken(token *jwt.Token) (string, error) {
-	panicMissingSecretKey()
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
 		return "", ErrInvalidClaims
@@ -57,8 +56,6 @@ func NewSignedToken(claims BaseClaims) (string, error) {
 //
 // It panics if a secret key was not provided beforehand via SetSecretKey.
 func VerifiedToken(tokenString string) (*jwt.Token, error) {
-	panicMissingSecretKey()
-
 	// This method will return an error if the token is invalid
 	// or if the signature does not match.
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
