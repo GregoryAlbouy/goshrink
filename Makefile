@@ -39,14 +39,17 @@ start-static:
 start-worker:
 	@go run $$(ls -1 ./cmd/worker/*.go | grep -v _test.go)
 
-.phony: post-guest
+.PHONY: post-guest
 post-guest:
 	curl -X POST -H "Content-Type:application/json" -d '{"username": "guest", "email": "guest@goshrink.com", "password": "password"}' http://localhost:9999/users
 
+.PHONY: login
+login:
+	 curl -X POST -H "Content-Type: application/json" -d '{"username": "Bret", "password": "password"}' http://localhost:9999/login
 
 .PHONY: post-avatar
 post-avatar:
-	@curl -X POST -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
+	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
 
 .PHONY: test
 test:
