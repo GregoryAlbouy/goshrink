@@ -17,6 +17,7 @@ const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
+	"API_JWT_SECRET":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
 	"MYSQL_USER":          "",
@@ -124,7 +125,7 @@ func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
 		UserService: database.NewUserService(db),
 	}
 
-	simplejwt.SetSecretKey([]byte("63b98f9f3c2da8d7480c867357a225c0d5d7c131"))
+	simplejwt.SetSecretKey([]byte(env["API_JWT_SECRET"]))
 
 	return http.NewServer(addr, repo, qp)
 }
