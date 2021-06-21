@@ -41,7 +41,7 @@ start-worker:
 
 .phony: post-guest
 post-guest:
-	curl -X POST -H "Content-Type: application/json" -d '{"username": "guest", "email": "guest@goshrink.com", "password": "password"}' http://localhost:9999/users
+	curl -X POST -H "Content-Type:application/json" -d '{"username": "guest", "email": "guest@goshrink.com", "password": "password"}' http://localhost:9999/users
 
 
 .PHONY: post-avatar
@@ -54,7 +54,7 @@ test:
 
 .PHONY: tests
 tests:
-	@go test -timeout 30s ./...
+	@go test -v -timeout 30s ./...
 
 .PHONY: docs
 docs:

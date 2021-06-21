@@ -9,7 +9,7 @@ import (
 
 const imageFormat = imaging.PNGFormat // TODO: make it actionnable
 
-// Rezise width used by the worker.
+// resizeWidth is the witdh used by the worker to resize an image.
 var resizeWidth int
 
 // processImage runs the full image processing logic.

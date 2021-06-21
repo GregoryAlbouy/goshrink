@@ -30,7 +30,8 @@ var FormatExt = map[Format]Ext{
 	PNGFormat:  PNGExt,
 }
 
-// DecodeRaw tries to decode and return a series of bytes as an image.
+// DecodeRaw decodes and returns a series of bytes as an image.
+// It returns the earliest error encountered while decoding.
 func DecodeRaw(rawFile []byte) (image.Image, error) {
 	r := bytes.NewReader(rawFile)
 	return imaging.Decode(r)
@@ -43,6 +44,7 @@ func Encode(w io.Writer, img *image.NRGBA, fmt Format) error {
 }
 
 // Reader encodes an *image.NRGBA and returns it as a new io.Reader.
+// It returns the earliest error encountered while reading.
 func Reader(img *image.NRGBA, fmt Format) (io.Reader, error) {
 	buf := bytes.Buffer{}
 
@@ -53,7 +55,7 @@ func Reader(img *image.NRGBA, fmt Format) (io.Reader, error) {
 }
 
 // Rescale sets an image width to the given value, preserving its aspect ratio.
-// Returns the modified image.
+// It returns the modified image.
 func Rescale(img image.Image, width int) *image.NRGBA {
 	return imaging.Resize(img, width, 0, imaging.NearestNeighbor)
 }

@@ -15,9 +15,9 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// multipartFormData represents the necessary data for creating
+// imageUpload represents the necessary data for creating
 // a new request with content type "multipart/form-data".
-type multipartFormData struct {
+type imageUpload struct {
 	userID   string
 	filename string
 	file     io.Reader
@@ -37,9 +37,9 @@ type messageHandler struct {
 // Upon receiving confirmation of the creation of the file storage side,
 // it writes the newly created file URL to the database.
 //
-// Any error during the process will is caught and returned to the caller.
+// It returns the earliest error encountered during the process.
 func (h messageHandler) handle(d amqp.Delivery) error {
-	log.Printf("Start handling message %d...", d.DeliveryTag)
+	log.Printf("Received message (tag %d)", d.DeliveryTag)
 
 	// Retrieve message values
 	userID := d.MessageId
@@ -56,23 +56,27 @@ func (h messageHandler) handle(d amqp.Delivery) error {
 		return err
 	}
 
-	data := multipartFormData{
+	upl := imageUpload{
 		userID:   d.MessageId,
 		filename: uuid.NewString() + string(ext),
 		file:     imageReader,
 	}
 
-	avatarURL, err := h.postImageToStorage(data)
+	avatarURL, err := h.postImageToStorage(upl)
 	if err != nil {
 		return err
 	}
 
-	return h.writeURLToDatabase(userID, avatarURL)
+	if err = h.writeURLToDatabase(userID, avatarURL); err != nil {
+		return err
+	}
+	log.Printf("Successfuly handled message (tag %d)", d.DeliveryTag)
+	return nil
 }
 
 // postImageToStorage makes a POST request to the storage.
 // It sends a "multipart/form-data" request with the userID and the image file.
-func (h messageHandler) postImageToStorage(d multipartFormData) (string, error) {
+func (h messageHandler) postImageToStorage(upl imageUpload) (string, error) {
 	body := bytes.Buffer{}
 	writer := multipart.NewWriter(&body)
 	defer writer.Close()
@@ -82,14 +86,14 @@ func (h messageHandler) postImageToStorage(d multipartFormData) (string, error) 
 	if err != nil {
 		return "", err
 	}
-	idPart.Write([]byte(d.userID))
+	idPart.Write([]byte(upl.userID))
 
 	// Create and write file part
-	filePart, err := writer.CreateFormFile("image", d.filename)
+	filePart, err := writer.CreateFormFile("image", upl.filename)
 	if err != nil {
 		return "", err
 	}
-	if _, err = io.Copy(filePart, d.file); err != nil {
+	if _, err = io.Copy(filePart, upl.file); err != nil {
 		return "", err
 	}
 
@@ -111,7 +115,7 @@ func (h messageHandler) postImageToStorage(d multipartFormData) (string, error) 
 		return "", err
 	}
 
-	if resp.StatusCode != 201 {
+	if resp.StatusCode != http.StatusCreated {
 		return "", fmt.Errorf("static server sent: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
