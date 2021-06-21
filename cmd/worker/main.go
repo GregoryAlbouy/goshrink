@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
@@ -24,32 +25,33 @@ var env = map[string]string{
 }
 
 func main() {
-	if err := run(); err != nil {
+	w := flag.Int("w", 200, "resize width")
+	flag.Parse()
+
+	if err := run(*w); err != nil {
 		log.Fatal(err)
 	}
-
-	// todo: flags
 }
 
-func run() error {
-	// Load env
+func run(w int) error {
 	envPath := dotenv.GetPath(defaultEnvPath)
 	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
 	}
 
-	// init queue
 	qc, err := initQueue()
 	if err != nil {
 		return err
 	}
 	defer qc.CloseConnection()
 
-	// init databse
 	db := initDatabase()
 	defer db.Close()
 
-	// handle queue messages
+	// Configure rezise width used by the worker
+	resizeWidth = w
+
+	// Configure the message handler and start consuming the queue messages.
 	h := messageHandler{
 		userService: database.NewUserService(db),
 	}

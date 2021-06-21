@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	resizeWidth = 200               // TODO: get this value via CLI flag
 	imageFormat = imaging.PNGFormat // TODO: make it actionnable
 )
+
+var resizeWidth int
 
 // processImage executes the whole image processing logic.
 // It takes a slice of bytes in input, decodes it to an image,
