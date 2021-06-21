@@ -25,15 +25,18 @@ var env = map[string]string{
 }
 
 func main() {
-	w := flag.Int("w", 200, "resize width")
+	width := flag.Int("w", 200, "resize width")
 	flag.Parse()
 
-	if err := run(*w); err != nil {
+	// Configure rezise width used by the worker
+	resizeWidth = *width
+
+	if err := run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(w int) error {
+func run() error {
 	envPath := dotenv.GetPath(defaultEnvPath)
 	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
@@ -47,9 +50,6 @@ func run(w int) error {
 
 	db := initDatabase()
 	defer db.Close()
-
-	// Configure rezise width used by the worker
-	resizeWidth = w
 
 	// Configure the message handler and start consuming the queue messages.
 	h := messageHandler{
