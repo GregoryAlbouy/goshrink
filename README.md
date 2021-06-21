@@ -199,5 +199,6 @@ Also, sub-packages have their own documentation when relevant that you may refer
 
 - [http](internal/http/README.md) (comes with handy curl commands)
 - [database](internal/database/README.md)
-- [static](cmd/static/README.md)
 - [queue](pkg/queue/README.md)
+- [static](cmd/static/README.md)
+- [worker](cmd/worker/README.md)
