@@ -1,6 +1,29 @@
-# Shrinker
+# Shrinker <!-- omit in toc -->
 
 Shrinker is a web API using a message broker in order to offload heavy computing tasks (namely image processing) to a worker.
+
+Authenticated users can make request to the API server to upload image file as their avatar. The images are resized to a smaller scale and saved to a file storage to be viewable by anyone.
+
+We currently support images uploaded in `.png` or `.jpeg` format.
+
+## Table of contents <!-- omit in toc -->
+
+- [Getting started](#getting-started)
+  - [Installing dependencies](#installing-dependencies)
+  - [Set up](#set-up)
+  - [Run the project](#run-the-project)
+  - [Call the endpoints for quick testing](#call-the-endpoints-for-quick-testing)
+- [Infrastructure](#infrastructure)
+  - [The API server](#the-api-server)
+  - [The message broker](#the-message-broker)
+  - [The worker](#the-worker)
+- [Control flow](#control-flow)
+- [Architecture](#architecture)
+  - [Folder structure](#folder-structure)
+  - [`internal`](#internal)
+  - [`pkg`](#pkg)
+  - [`cmd`](#cmd)
+  - [Miscellaneous](#miscellaneous)
 
 ## Getting started
 
@@ -47,7 +70,7 @@ mkdir storage
 
 This project uses 3 executables and one instance of a message queue. You need to run them all at the same time.
 
-#### Message queue
+#### Message queue <!-- omit in toc -->
 
 The message queue must be up and running before anything else.
 
@@ -55,19 +78,19 @@ The message queue must be up and running before anything else.
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
-#### API server
+#### API server <!-- omit in toc -->
 
 ```sh
 make start-server
 ```
 
-#### Static file server
+#### Static file server <!-- omit in toc -->
 
 ```sh
 make start-static
 ```
 
-#### Worker
+#### Worker <!-- omit in toc -->
 
 ```sh
 make start-worker
@@ -121,7 +144,7 @@ It uses RabbitMQ.
 
 The worker makes resquests to store files and can write in the database.
 
-It leverages two customs modules, `queue` package built ontop of [streadway/amqp](https://github.com/streadway/amqp) and `imaging` wrapping [disintegration/imaging](https://github.com/disintegration/imaging) for image processing.
+It leverages two customs modules, `queue` package built ontop of [streadway/amqp](https://github.com/streadway/amqp) and `imaging` which wraps [disintegration/imaging](https://github.com/disintegration/imaging) for image processing.
 
 ## Control flow
 
