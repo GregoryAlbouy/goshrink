@@ -22,17 +22,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fs := http.Dir(env["STATIC_FILE_PATH"])
-	// GET /storage/<filename>
-	http.Handle("/storage/", httplog.RequestLogger(handleFileServe("/storage", fs)))
-	// POST /storage/avatar
-	http.Handle("/storage/avatar", httplog.RequestLogger(requireAPIKey(handleImageUpload)))
-
+	router := initRouter()
 	addr := ":" + env["STATIC_SERVER_PORT"]
-
 	log.Printf("Static server listening at http://localhost%s\n", addr)
 
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := http.ListenAndServe(addr, httplog.RequestLogger(router)); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func initRouter() *http.ServeMux {
+	router := http.NewServeMux()
+	fs := http.Dir(env["STATIC_FILE_PATH"])
+	// GET /storage/<filename>
+	router.Handle("/storage/", handleFileServe("/storage", fs))
+	// POST /storage/avatar
+	router.Handle("/storage/avatar", requireAPIKey(handleImageUpload))
+	return router
 }
