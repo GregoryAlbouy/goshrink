@@ -33,8 +33,10 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 	// Place the pointer back at the start of the file
 	file.Seek(0, io.SeekStart)
 
+	filepath := buildFilepath(headers.Filename)
+
 	// Create a destination on disk
-	dst, err := os.OpenFile(buildFilepath(headers.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	dst, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		http.Error(w, "internal error: failed to create file", http.StatusInternalServerError)
 		return
@@ -47,14 +49,25 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(201)
-	w.Write([]byte("Created\n"))
+	fileURL := buildFileURL(filepath)
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fileURL))
 }
 
 // buildFilepath efficiently builds a filepath string from the given filename.
 func buildFilepath(filename string) string {
 	var sb strings.Builder
 	parts := []string{env["STATIC_FILE_PATH"], "/", filename}
+	for _, v := range parts {
+		sb.WriteString(v)
+	}
+	return sb.String()
+}
+
+// buildFileURL efficiently builds a file URL string from the given filepath.
+func buildFileURL(filepath string) string {
+	var sb strings.Builder
+	parts := []string{"http://localhost", ":", env["STATIC_SERVER_PORT"], "/", filepath}
 	for _, v := range parts {
 		sb.WriteString(v)
 	}
