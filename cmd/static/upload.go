@@ -30,8 +30,6 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
-	// Place the pointer back at the start of the file
-	file.Seek(0, io.SeekStart)
 
 	filepath := buildFilepath(headers.Filename)
 
