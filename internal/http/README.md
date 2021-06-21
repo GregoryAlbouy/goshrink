@@ -45,12 +45,29 @@ Response:
 201 Created
 ```
 
+### Login
+
+Request:
+
+```sh
+curl -X POST -H "Content-Type: application/json" -d '{"username": "user", "password": "pkEfkV39Bs"}' http://localhost:9999/login
+```
+
+Response:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQxODMzMjAsImp0aSI6IjEifQ.gl2EQWCxszEHXkQkR4HIAhyhIxwufowdlaNJSOtIYek"
+}
+```
+
 ### Upload an avatar
 
 Request:
 
 ```sh
-curl -X POST -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/users/1/avatar
+curl -X POST -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQxODMzMjAsImp0aSI6IjEifQ.gl2EQWCxszEHXkQkR4HIAhyhIxwufowdlaNJSOtIYek" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/users/1/avatar
+
 ```
 
 Response:
@@ -58,5 +75,3 @@ Response:
 ```txt
 202 Accepted
 ```
-
-> Note: this endpoint will require the user to be authenticated in the future.

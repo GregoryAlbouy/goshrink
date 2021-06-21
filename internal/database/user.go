@@ -34,6 +34,21 @@ func (s *userService) FindByID(userID int) (internal.User, error) {
 	return u, nil
 }
 
+// FindCreds retrieves a user credentials by its username.
+func (s *userService) FindCreds(username string) (internal.User, error) {
+	u := internal.User{}
+
+	if err := s.db.Get(
+		&u,
+		"SELECT id, username, password FROM user WHERE username = ?",
+		username,
+	); err != nil {
+		return internal.User{}, err
+	}
+
+	return u, nil
+}
+
 func (s *userService) SetAvatarURL(userID int, url string) error {
 	if _, err := s.db.Exec(
 		"REPLACE INTO avatar (user_id, avatar_url) VALUES (?, ?)",
@@ -63,10 +78,10 @@ func (s *userService) InsertOne(u internal.User) error {
 	return nil
 }
 
-// Migrate inserts the given users in the database
-func (s *userService) Migrate(users []internal.User) error {
+// Migrate inserts the given users in the database.
+func (s *userService) Migrate(users []*internal.User) error {
 	for _, u := range users {
-		if err := s.InsertOne(u); err != nil {
+		if err := s.InsertOne(*u); err != nil {
 			return err
 		}
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/streadway/amqp"
 )
 
@@ -16,6 +17,7 @@ const defaultEnvPath = "./.env"
 
 var env = map[string]string{
 	"API_SERVER_PORT":     "",
+	"API_JWT_SECRET":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
 	"MYSQL_USER":          "",
@@ -53,7 +55,7 @@ func run(envPath string, migrate bool) error {
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
 	qp, err := initQueue()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("rabbitmq error: %s", err)
 	}
 	defer qp.CloseConnection()
 
@@ -108,7 +110,10 @@ func initQueue() (queue.Producer, error) {
 
 func migrateMockUsers(db *database.DB) {
 	userService := database.NewUserService(db)
-	users := mock.Users
+	users, err := mock.GetUsersWithHashedPasswords()
+	if err != nil {
+		log.Fatal(err)
+	}
 	if err := userService.Migrate(users); err != nil {
 		log.Fatal(err)
 	}
@@ -119,6 +124,8 @@ func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
+
+	simplejwt.SetSecretKey([]byte(env["API_JWT_SECRET"]))
 
 	return http.NewServer(addr, repo, qp)
 }

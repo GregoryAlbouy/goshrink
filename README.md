@@ -73,6 +73,32 @@ make start-static
 make start-worker
 ```
 
+### Call the endpoints for quick testing
+
+In order to showcase the main point of this project, we provide 2 handy scripts in the [Makefile](/Makefile) for quick tests.
+
+These scripts are only concerned with login you in and making an upload request as that user. They are written for working with our dummy user _Bret_.
+
+```sh
+make login
+# {"access_token": "<your_token>"}
+
+t=<your_token> make post-avatar
+# 202 Accepted
+```
+
+You can now get the updated user and open in your browser the URL to see the processed image.
+
+```sh
+curl http://localhost:9999/users/1
+# {
+#   "id":1,
+#   "username":"Bret",
+#   "email":"Sincere@april.biz",
+#   "avatar_url":"http://localhost:8000/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
+# }
+```
+
 ## Infrastructure
 
 ![infrastrucute schema](docs/infrastructure.svg)
