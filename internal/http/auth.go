@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/authtoken"
 	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
 	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 )
@@ -21,7 +21,10 @@ type Creds struct {
 
 type ContextKey string
 
-const UserKey ContextKey = "user"
+const (
+	userKey      ContextKey = "user"
+	bearerScheme string     = "Bearer "
+)
 
 func (s *Server) registerAuthRoutes() {
 	s.router.HandleFunc("/login", s.handleLogin).Methods("POST")
@@ -58,11 +61,12 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenString, err := authtoken.BearerToken(r)
-		if err != nil {
+		a := r.Header.Get("Authorization")
+		if !strings.HasPrefix(a, bearerScheme) {
 			respondHTTPError(w, ErrUnauthorized)
 			return
 		}
+		tokenString := strings.TrimPrefix(a, bearerScheme)
 
 		token, err := simplejwt.VerifiedToken(tokenString)
 		if err != nil {
@@ -86,13 +90,13 @@ func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
 			respondHTTPError(w, ErrNotFound)
 			return
 		}
-		ctx := context.WithValue(r.Context(), UserKey, &u)
+		ctx := context.WithValue(r.Context(), userKey, &u)
 		hf(w, r.WithContext(ctx))
 	}
 }
 
 func userFromContext(ctx context.Context) *internal.User {
-	if u := ctx.Value(UserKey); u != nil {
+	if u := ctx.Value(userKey); u != nil {
 		return u.(*internal.User)
 	}
 	return nil
