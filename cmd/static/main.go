@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
+	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
 )
 
 const defaultEnvPath = "./.env"
@@ -22,11 +23,10 @@ func main() {
 	}
 
 	fs := http.Dir(env["STATIC_FILE_PATH"])
-
 	// GET /static/<filename>
-	http.Handle("/static/", handleFileServe("/static", fs))
+	http.Handle("/static/", httplog.RequestLogger(handleFileServe("/static", fs)))
 	// POST /static/avatar
-	http.HandleFunc("/static/avatar", requireAPIKey(handleImageUpload))
+	http.HandleFunc("/static/avatar", httplog.RequestLogger(requireAPIKey(handleImageUpload)).ServeHTTP)
 
 	addr := ":" + env["STATIC_SERVER_PORT"]
 

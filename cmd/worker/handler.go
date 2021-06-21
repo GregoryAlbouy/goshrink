@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -16,8 +15,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// TODO: rename
-type fileMessage struct {
+type multipartFormData struct {
 	userID   string
 	filename string
 	file     io.Reader
@@ -27,8 +25,11 @@ type messageHandler struct {
 	userService internal.UserService
 }
 
+// handle runs the full worker job process.
+//
+//
 func (h messageHandler) handle(d amqp.Delivery) error {
-	log.Println("Got avatar from " + d.MessageId)
+	log.Printf("Start handling message %d...", d.DeliveryTag)
 
 	// Retrieve message values
 	userID := d.MessageId
@@ -45,27 +46,23 @@ func (h messageHandler) handle(d amqp.Delivery) error {
 		return err
 	}
 
-	// Build the data to be sent to database and static server
-	filename := uuid.NewString() + string(ext)
-	fm := fileMessage{
+	data := multipartFormData{
 		userID:   d.MessageId,
-		filename: filename,
+		filename: uuid.NewString() + string(ext),
 		file:     imageReader,
 	}
 
-	// Post image file to static server
-	avatarURL, err := h.postFileToStaticServer(fm)
+	avatarURL, err := h.postFileToStaticServer(data)
 	if err != nil {
 		return err
 	}
 
-	// Insert avatarURL into the database
 	return h.updateAvatarURLInDatabase(userID, avatarURL)
 }
 
 // postFileToStaticServer makes a POST request to the static server.
 // It uses a Multipart/FormData to send the userID and the image file.
-func (h messageHandler) postFileToStaticServer(fm fileMessage) (string, error) {
+func (h messageHandler) postFileToStaticServer(d multipartFormData) (string, error) {
 	body := bytes.Buffer{}
 	writer := multipart.NewWriter(&body)
 	defer writer.Close()
@@ -75,16 +72,18 @@ func (h messageHandler) postFileToStaticServer(fm fileMessage) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	idPart.Write([]byte(fm.userID))
+	idPart.Write([]byte(d.userID))
 
 	// Create and write file part
-	filePart, err := writer.CreateFormFile("image", fm.filename)
+	filePart, err := writer.CreateFormFile("image", d.filename)
 	if err != nil {
 		return "", err
 	}
-	if n, err := io.Copy(filePart, fm.file); err != nil {
-		return "", errors.New(fmt.Sprintf("%s\n%d bytes written\n", err, n))
+	if _, err = io.Copy(filePart, d.file); err != nil {
+		return "", err
 	}
+
+	writer.Close()
 
 	// Build HTTP request
 	url := env["STATIC_SERVER_URL"] + "/static/avatar"
@@ -102,20 +101,18 @@ func (h messageHandler) postFileToStaticServer(fm fileMessage) (string, error) {
 		return "", err
 	}
 
-	if err := validateStatusCode(resp.StatusCode); err != nil {
-		return "", err
+	if resp.StatusCode != 201 {
+		return "", fmt.Errorf("static server sent: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
 	// Handle static server response
-	content, err := ioutil.ReadAll(resp.Body)
+	content, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
-	avatarURL := string(content)
-	log.Println(content)
-	return avatarURL, nil
+	return string(content), nil
 }
 
 func (h messageHandler) updateAvatarURLInDatabase(userID, avatarURL string) error {
@@ -124,11 +121,4 @@ func (h messageHandler) updateAvatarURLInDatabase(userID, avatarURL string) erro
 		return err
 	}
 	return h.userService.SetAvatarURL(id, avatarURL)
-}
-
-func validateStatusCode(code int) error {
-	if code < 200 || code > 299 {
-		return errors.New("bad")
-	}
-	return nil
 }

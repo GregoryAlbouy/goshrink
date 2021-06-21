@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -13,8 +12,6 @@ import (
 // handleImageUpload handles requests to upload an image to the server.
 // The uploaded image is save on the disk if the request is accepted.
 func handleImageUpload(w http.ResponseWriter, r *http.Request) {
-	log.Println("got upload request")
-
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
