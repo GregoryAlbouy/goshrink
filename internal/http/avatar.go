@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
@@ -14,7 +15,13 @@ func (s *Server) registerAvatarRoutes() {
 }
 
 func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("upload")
+	id, err := extractID(r)
+	if err != nil {
+		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
+	}
+
+	file, _, err := r.FormFile("image")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
@@ -26,16 +33,17 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := extractID(r)
-	if err != nil {
-		respondHTTPError(w, ErrBadRequest.Wrap(err))
+	// Place the pointer back at the start of the file
+	file.Seek(0, io.SeekStart)
+	msg := new(bytes.Buffer)
+	if _, err := msg.ReadFrom(file); err != nil {
+		respondHTTPError(w, ErrInternal.Wrap(err))
 		return
 	}
 
-	msg := new(bytes.Buffer)
-	msg.ReadFrom(file)
 	if err = s.imageQueue.Publish(msg.Bytes(), fmt.Sprint(id)); err != nil {
 		respondHTTPError(w, ErrInternal.Wrap(err))
+		return
 	}
 
 	respondJSON(w, 202, "Accepted\n")

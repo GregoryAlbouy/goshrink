@@ -34,4 +34,4 @@ jobs:
         run: go build -v ./cmd/server/main.go
 
       - name: Build Worker
-        run: go build -v ./cmd/worker/main.go
+        run: go build -v $(ls -1 ./cmd/worker/*.go | grep -v _test.go)
