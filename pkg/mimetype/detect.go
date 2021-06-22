@@ -7,26 +7,22 @@ import (
 
 const contentTypeMaxBytes = 512
 
-// Detect returns the MIME type of file. The file must be provided as a stream.
-//
-// Using Detect moves the pointer reading bytes of the io.Reader. It the file
-// needs to be read again, make sure to move the pointer back at the start with
-// `file.Seek(0, io.SeekStart)`.
-func Detect(file io.Reader) (string, error) {
+// Detect returns the MIME type of file. The file must be provided as a an
+// interface that implements the basic Read and Seek methods.
+func Detect(file io.ReadSeeker) (string, error) {
 	buf := make([]byte, contentTypeMaxBytes)
 
 	if _, err := file.Read(buf); err != nil {
 		return "", err
 	}
+	// Sets the pointer to the beginning of the file so it can be read again.
+	defer file.Seek(0, io.SeekStart)
 	return http.DetectContentType(buf), nil
 }
 
-// IsImage checks if the given file is an image type.
-//
-// Using IsImage moves the pointer reading bytes of the io.Reader. It the file
-// needs to be read again, make sure to move the pointer back at the start with
-// `file.Seek(0, io.SeekStart)`.
-func IsImage(file io.Reader) bool {
+// IsImage checks if the given file is an image type. The file must be provided as a an
+// interface that implements the basic Read and Seek methods.
+func IsImage(file io.ReadSeeker) bool {
 	// An error while reading the file is interpreted as "not an image".
 	kind, _ := Detect(file)
 	return kind == JPEG || kind == PNG

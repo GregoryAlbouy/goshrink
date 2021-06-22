@@ -5,8 +5,9 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/gorilla/mux"
 )
 
@@ -24,32 +25,34 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, qp queue.Producer) (*Server, error) {
+func NewServer(addr string, repo Repository, qp queue.Producer, secretKey string) *Server {
 	s := &Server{
-		Server: &http.Server{Addr: addr},
-		router: mux.NewRouter().StrictSlash(true),
-		Repository: Repository{
-			UserService: repo.UserService,
-		},
+		Server:     &http.Server{Addr: addr},
+		Repository: repo,
 		imageQueue: qp,
 	}
+	simplejwt.SetSecretKey([]byte(secretKey))
 
-	s.router.Use(httplog.RequestLogger)
-
-	s.registerAllRoutes()
-	s.Handler = s.router
-
-	return s, nil
+	return s
 }
 
 // Start launches the server.
 func (s *Server) Start() error {
+	s.initRouter()
+
 	log.Printf("Server listening at http://localhost%s\n", s.Addr)
 
 	if err := s.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *Server) initRouter() {
+	s.router = mux.NewRouter().StrictSlash(true)
+	s.router.Use(httputil.RequestLogger)
+	s.registerAllRoutes()
+	s.Handler = s.router
 }
 
 // registerAllRoutes registers each entity's routes on the server.

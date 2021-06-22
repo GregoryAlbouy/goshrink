@@ -1,6 +1,31 @@
-# Shrinker
+# Shrinker <!-- omit in toc -->
 
-Shrinker is a web API using a message broker in order to offload heavy computing tasks (namely image processing) to a worker.
+Shrinker is an application that uses a message broker to offload image processing tasks from a web API to a dedicated worker.
+
+Authenticated users can make request to the API server to upload image file as their avatar. The images are resized to a smaller scale and saved to a file storage to be viewable by anyone.
+
+We currently support images uploaded in `.png` or `.jpeg` format.
+
+## Table of contents <!-- omit in toc -->
+
+- [Getting started](#getting-started)
+  - [Installing dependencies](#installing-dependencies)
+  - [Set up](#set-up)
+  - [Run the project](#run-the-project)
+  - [Call the endpoints for quick testing](#call-the-endpoints-for-quick-testing)
+- [Infrastructure](#infrastructure)
+  - [The API server](#the-api-server)
+  - [The message broker](#the-message-broker)
+  - [The worker](#the-worker)
+- [Control flow](#control-flow)
+- [Architecture](#architecture)
+  - [Folder structure](#folder-structure)
+  - [`internal`](#internal)
+  - [`pkg`](#pkg)
+  - [`cmd`](#cmd)
+  - [Miscellaneous](#miscellaneous)
+- [Further documentation](#further-documentation)
+- [Acknowledgement and contributors](#acknowledgement-and-contributors)
 
 ## Getting started
 
@@ -10,7 +35,7 @@ Shrinker is a web API using a message broker in order to offload heavy computing
 go get -u
 ```
 
-> Note: Go version 1.15 minimum is required.
+> Note: Go version 1.16 minimum is required.
 
 ### Set up
 
@@ -47,7 +72,7 @@ mkdir storage
 
 This project uses 3 executables and one instance of a message queue. You need to run them all at the same time.
 
-#### Message queue
+#### Message queue <!-- omit in toc -->
 
 The message queue must be up and running before anything else.
 
@@ -55,19 +80,19 @@ The message queue must be up and running before anything else.
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 
-#### API server
+#### API server <!-- omit in toc -->
 
 ```sh
 make start-server
 ```
 
-#### Static file server
+#### Static file server <!-- omit in toc -->
 
 ```sh
 make start-storage
 ```
 
-#### Worker
+#### Worker <!-- omit in toc -->
 
 ```sh
 make start-worker
@@ -77,7 +102,7 @@ make start-worker
 
 In order to showcase the main point of this project, we provide 2 handy scripts in the [Makefile](/Makefile) for quick tests.
 
-These scripts are only concerned with login you in and making an upload request as that user. They are written for working with our dummy user _Bret_.
+These scripts are only concerned with login you in and making an upload request as that user. They are written to work with our dummy user _Bret_.
 
 ```sh
 make login
@@ -101,6 +126,8 @@ curl http://localhost:9999/users/1
 
 ## Infrastructure
 
+We aim to mimic what a cloud based infrastructure would be, to minimize the overhead of swapping to such a deployment strategy later.
+
 ![infrastrucute schema](docs/infrastructure.svg)
 
 Each of the 5 entites above runs in a docker container.
@@ -109,19 +136,19 @@ The 3 main applicative entities are the **API server**, the **worker** and the *
 
 ### The API server
 
-The API simply interacts with the message broker and the database based on a client request.
+The API simply answers to client requests and interacts with the database and the message broker when resquests call for it.
 
 ### The message broker
 
-The message broker is in charge of asking the worker to start its job.
+The message broker is in charge of forwarding API messages to the worker for it to start its job.
 
 It uses RabbitMQ.
 
 ### The worker
 
-The worker makes resquests to store files and can write in the database.
+The worker runs its job then makes resquests to store files and can write in the database.
 
-It leverages two customs modules, `queue` package built ontop of [streadway/amqp](https://github.com/streadway/amqp) and `imaging` wrapping [disintegration/imaging](https://github.com/disintegration/imaging) for image processing.
+It leverages two customs modules, `queue` package built ontop of [streadway/amqp](https://github.com/streadway/amqp) and `imaging` which wraps [disintegration/imaging](https://github.com/disintegration/imaging) for image processing.
 
 ## Control flow
 
@@ -162,19 +189,29 @@ The main application code, it can be viewed as private. Domain related type defi
 
 ### `pkg`
 
-Reusable library code. It is safe to use by external applications. It does not import any types from `internal` and does not rely on it to work. No domain logic spills out in package inside this directory.
+Reusable library code. It is safe to use by external applications. It does not import any types from `internal` and does not rely on it to work. There is no domain logic inside this directory.
 
 ### `cmd`
 
-Main applications for this project. Each direcory inside are equivalent to one executable and are independant from one another. A `main` function may need to import and call code from `internal` or `pkg`. If so, it will ties all dependencies together.
+Main applications for the project. Children direcories are each equivalent to one executable and are independant from one another. A `main` function may need to import and call code from `internal` or `pkg`. If so, it will ties all dependencies together.
 
 ### Miscellaneous
 
 Other directories are self explanatory.
 
-Also, sub-packages have their own documentation when relevant that you may refer to for further explanation. Notably:
+## Further documentation
+
+Sub-packages have their own documentation when it is relevant. You may refer to these docs for further explanation: Notably:
 
 - [http](internal/http/README.md) (comes with handy curl commands)
 - [database](internal/database/README.md)
-- [storage](cmd/storage/README.md)
 - [queue](pkg/queue/README.md)
+- [storage](cmd/storage/README.md)
+- [worker](cmd/worker/README.md)
+
+## Acknowledgement and contributors
+
+This project is part of an school assignement. Our team members are:
+
+- Gregory Albouy
+- Thomas Moreira

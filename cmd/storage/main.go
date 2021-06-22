@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
-	"github.com/GregoryAlbouy/shrinker/pkg/httplog"
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 )
 
 const defaultEnvPath = "./.env"
@@ -26,7 +26,7 @@ func main() {
 	addr := ":" + env["STORAGE_SERVER_PORT"]
 	log.Printf("Static server listening at http://localhost%s\n", addr)
 
-	if err := http.ListenAndServe(addr, httplog.RequestLogger(router)); err != nil {
+	if err := http.ListenAndServe(addr, httputil.RequestLogger(router)); err != nil {
 		log.Fatal(err)
 	}
 }

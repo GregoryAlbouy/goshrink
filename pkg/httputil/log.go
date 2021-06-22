@@ -1,6 +1,7 @@
-package httplog
+package httputil
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -38,4 +39,28 @@ func RequestLogger(h http.Handler) http.Handler {
 		c := statusColor(rw.Status)
 		log.Printf("%s %s -> %s %s", r.Method, r.URL.String(), c(rw.Status), c(http.StatusText(rw.Status)))
 	})
+}
+
+var (
+	success   = color("\033[1;32m%s\033[0m")
+	clientErr = color("\033[1;33m%s\033[0m")
+	serverErr = color("\033[1;31m%s\033[0m")
+)
+
+func color(a string) func(...interface{}) string {
+	sprint := func(args ...interface{}) string {
+		return fmt.Sprintf(a, fmt.Sprint(args...))
+	}
+	return sprint
+}
+
+func statusColor(statusCode int) func(...interface{}) string {
+	switch {
+	case statusCode >= 500:
+		return serverErr
+	case statusCode >= 400:
+		return clientErr
+	default:
+		return success
+	}
 }

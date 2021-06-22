@@ -27,7 +27,7 @@ func decodeBody(body io.ReadCloser, dest interface{}) error {
 	decoder.DisallowUnknownFields()
 
 	if err := decoder.Decode(dest); err != nil {
-		return ErrUnprocessableEntity.Wrap(err)
+		return err
 	}
 	return nil
 }

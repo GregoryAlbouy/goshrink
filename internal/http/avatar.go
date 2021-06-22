@@ -3,7 +3,6 @@ package http
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
@@ -24,6 +23,7 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 	u := userFromContext(r.Context())
 	if u.ID != id {
 		respondHTTPError(w, ErrUnauthorized)
+		return
 	}
 
 	file, _, err := r.FormFile("image")
@@ -38,8 +38,6 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Place the pointer back at the start of the file
-	file.Seek(0, io.SeekStart)
 	msg := new(bytes.Buffer)
 	if _, err := msg.ReadFrom(file); err != nil {
 		respondHTTPError(w, ErrInternal.Wrap(err))

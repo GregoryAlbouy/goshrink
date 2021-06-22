@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/authtoken"
 	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
+	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
 	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 )
 
@@ -21,7 +21,9 @@ type Creds struct {
 
 type ContextKey string
 
-const UserKey ContextKey = "user"
+const (
+	userKey ContextKey = "user"
+)
 
 func (s *Server) registerAuthRoutes() {
 	s.router.HandleFunc("/login", s.handleLogin).Methods("POST")
@@ -32,6 +34,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	creds := &Creds{}
 	if err := decodeBody(r.Body, creds); err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
 	}
 
 	u, err := s.UserService.FindCreds(creds.Username)
@@ -58,7 +61,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tokenString, err := authtoken.BearerToken(r)
+		tokenString, err := httputil.BearerToken(r)
 		if err != nil {
 			respondHTTPError(w, ErrUnauthorized)
 			return
@@ -86,13 +89,13 @@ func (s *Server) requireAuth(hf http.HandlerFunc) http.HandlerFunc {
 			respondHTTPError(w, ErrNotFound)
 			return
 		}
-		ctx := context.WithValue(r.Context(), UserKey, &u)
+		ctx := context.WithValue(r.Context(), userKey, &u)
 		hf(w, r.WithContext(ctx))
 	}
 }
 
 func userFromContext(ctx context.Context) *internal.User {
-	if u := ctx.Value(UserKey); u != nil {
+	if u := ctx.Value(userKey); u != nil {
 		return u.(*internal.User)
 	}
 	return nil
