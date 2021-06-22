@@ -5,7 +5,7 @@ default:
 # Full app build in docker
 
 .PHONY: docker-up
-docker:
+docker-up:
 	@docker-compose --env-file ./.env up --build
 
 .PHONY: docker-down
