@@ -25,34 +25,34 @@ type Repository struct {
 }
 
 // NewServer returns a new instance of Server given configuration parameters.
-func NewServer(addr string, repo Repository, qp queue.Producer, secretKey string) (*Server, error) {
+func NewServer(addr string, repo Repository, qp queue.Producer, secretKey string) *Server {
 	s := &Server{
-		Server: &http.Server{Addr: addr},
-		router: mux.NewRouter().StrictSlash(true),
-		Repository: Repository{
-			UserService: repo.UserService,
-		},
+		Server:     &http.Server{Addr: addr},
+		Repository: repo,
 		imageQueue: qp,
 	}
-
-	s.router.Use(httputil.RequestLogger)
-
-	s.registerAllRoutes()
-	s.Handler = s.router
-
 	simplejwt.SetSecretKey([]byte(secretKey))
 
-	return s, nil
+	return s
 }
 
 // Start launches the server.
 func (s *Server) Start() error {
+	s.initRouter()
+
 	log.Printf("Server listening at http://localhost%s\n", s.Addr)
 
 	if err := s.ListenAndServe(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *Server) initRouter() {
+	s.router = mux.NewRouter().StrictSlash(true)
+	s.router.Use(httputil.RequestLogger)
+	s.registerAllRoutes()
+	s.Handler = s.router
 }
 
 // registerAllRoutes registers each entity's routes on the server.

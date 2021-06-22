@@ -60,10 +60,7 @@ func run(envPath string, migrate bool) error {
 
 	queue.SetQueueName(env["QUEUE_NAME"])
 
-	srv, err := initServer(db, qp)
-	if err != nil {
-		return err
-	}
+	srv := initServer(db, qp)
 
 	if err := srv.Start(); err != nil {
 		return err
@@ -118,7 +115,7 @@ func migrateMockUsers(db *database.DB) {
 	}
 }
 
-func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
+func initServer(db *database.DB, qp queue.Producer) *http.Server {
 	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
