@@ -97,22 +97,31 @@ In order to showcase the main point of this project, we provide some handy scrip
 
 These scripts are only concerned with login you in as our test user and making an upload request as them.
 
-> ```sh
-> make post-user
-> ```
+Create a new user (`email` can be omitted as it is not relevant to our usecase).
 
 ```sh
-make post-login
-# {"access_token": "<your_token>"}
+./scripts/post-user <username> <password> [<email>]
+# 201 Created
+```
 
-t=<your_token> make post-avatar
+Login in as that user.
+
+```sh
+./scripts/post-login <username> <password>
+# {"access_token": "<token>"}
+```
+
+Upload an avatar (`filepath` is defaulted to `fixtures/sample.png` if not specified).
+
+```sh
+./scripts/post-avatar <token> [<filepath>]
 # 202 Accepted
 ```
 
 You can now get the updated user and open in your browser the URL to see the processed image.
 
 ```sh
-curl http://localhost:9999/users/1
+curl http://localhost:9999/users/<username>
 # {
 #   "id":1,
 #   "username":"amdin",
@@ -152,7 +161,7 @@ It leverages two customs modules, `queue` package built ontop of [streadway/amqp
 The main work flow of this project is the request for a user to upload an avatar.
 
 ```txt
-POST /api/v1/users/{ID}/avatar
+POST /api/avatar
 
 content type: multipart/form-data
 body: <image_file>
