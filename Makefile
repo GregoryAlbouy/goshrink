@@ -42,7 +42,7 @@ rabbitmq:
 
 .PHONY: local-server
 local-server:
-	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
+	@go run $$(ls -1 ./cmd/server/*.go | grep -v _test.go)
 
 .PHONY: local-storage
 local-storage:
@@ -50,7 +50,7 @@ local-storage:
 
 .PHONY: local-worker
 local-worker:
-	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
+	@go run $$(ls -1 ./cmd/local/*.go | grep -v _test.go)
 
 # Test commands
 
