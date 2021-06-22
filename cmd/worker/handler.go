@@ -100,13 +100,13 @@ func (h messageHandler) postImageToStorage(upl imageUpload) (string, error) {
 	writer.Close()
 
 	// Build HTTP request
-	url := env["STATIC_SERVER_URL"] + "/storage/avatar"
+	url := env["STORAGE_SERVER_URL"] + "/storage/avatar"
 	request, err := http.NewRequest("POST", url, &body)
 	if err != nil {
 		return "", err
 	}
 	request.Header.Add("Content-Type", writer.FormDataContentType())
-	request.Header.Add("Authorization", "Bearer "+env["STATIC_SERVER_KEY"])
+	request.Header.Add("Authorization", "Bearer "+env["STORAGE_SERVER_KEY"])
 
 	// Send the request
 	client := &http.Client{}
@@ -116,10 +116,10 @@ func (h messageHandler) postImageToStorage(upl imageUpload) (string, error) {
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		return "", fmt.Errorf("static server sent: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
+		return "", fmt.Errorf("storage server sent: %d %s", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 
-	// Handle static server response
+	// Handle storage server response
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err

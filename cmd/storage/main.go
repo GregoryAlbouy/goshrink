@@ -11,9 +11,9 @@ import (
 const defaultEnvPath = "./.env"
 
 var env = map[string]string{
-	"STATIC_FILE_PATH":   "",
-	"STATIC_SERVER_PORT": "",
-	"STATIC_SERVER_KEY":  "",
+	"STORAGE_FILE_PATH":   "",
+	"STORAGE_SERVER_PORT": "",
+	"STORAGE_SERVER_KEY":  "",
 }
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	router := initRouter()
-	addr := ":" + env["STATIC_SERVER_PORT"]
+	addr := ":" + env["STORAGE_SERVER_PORT"]
 	log.Printf("Static server listening at http://localhost%s\n", addr)
 
 	if err := http.ListenAndServe(addr, httputil.RequestLogger(router)); err != nil {
@@ -33,7 +33,7 @@ func main() {
 
 func initRouter() *http.ServeMux {
 	router := http.NewServeMux()
-	fs := http.Dir(env["STATIC_FILE_PATH"])
+	fs := http.Dir(env["STORAGE_FILE_PATH"])
 	// GET /storage/<filename>
 	router.Handle("/storage/", handleFileServe("/storage", fs))
 	// POST /storage/avatar

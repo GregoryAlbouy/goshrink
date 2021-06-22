@@ -15,13 +15,13 @@ const defaultEnvPath = "./.env"
 var env = map[string]string{
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
-	"MYSQL_DOMAIN":        "",
+	"MYSQL_HOST":          "",
 	"MYSQL_PORT":          "",
 	"MYSQL_DATABASE":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
-	"STATIC_SERVER_KEY":   "",
-	"STATIC_SERVER_URL":   "",
+	"STORAGE_SERVER_KEY":  "",
+	"STORAGE_SERVER_URL":  "",
 }
 
 func main() {
@@ -63,7 +63,7 @@ func initDatabase() *database.DB {
 	cfg := database.Config{
 		User:     env["MYSQL_USER"],
 		Password: env["MYSQL_ROOT_PASSWORD"],
-		Domain:   env["MYSQL_DOMAIN"],
+		Domain:   env["MYSQL_HOST"],
 		Port:     env["MYSQL_PORT"],
 		Database: env["MYSQL_DATABASE"],
 	}
