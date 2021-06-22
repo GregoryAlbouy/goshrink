@@ -13,16 +13,18 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const defaultEnvPath = "./.env"
+const (
+	defaultEnvPath = "./.env"
+	defaultPort    = "80"
+)
 
 var env = map[string]string{
-	"API_SERVER_PORT":     "",
 	"API_JWT_SECRET":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
 	"MYSQL_USER":          "",
 	"MYSQL_ROOT_PASSWORD": "",
-	"MYSQL_DOMAIN":        "",
+	"MYSQL_HOST":          "",
 	"MYSQL_PORT":          "",
 	"MYSQL_DATABASE":      "",
 }
@@ -80,12 +82,12 @@ func mustInitDatabase() *database.DB {
 	cfg := database.Config{
 		User:     env["MYSQL_USER"],
 		Password: env["MYSQL_ROOT_PASSWORD"],
-		Domain:   env["MYSQL_DOMAIN"],
+		Domain:   env["MYSQL_HOST"],
 		Port:     env["MYSQL_PORT"],
 		Database: env["MYSQL_DATABASE"],
 	}
 
-	db.MustInit(cfg)
+	db.MustConnect(cfg)
 	log.Printf("Server connected to database %s", env["MYSQL_DATABASE"])
 	return db
 }
@@ -120,7 +122,7 @@ func migrateMockUsers(db *database.DB) {
 }
 
 func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
-	addr := ":" + env["API_SERVER_PORT"]
+	addr := ":" + defaultPort
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
