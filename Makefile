@@ -1,11 +1,22 @@
-.PHONY: start
-start:
-	@make docker && \
-	make run
+.PHONY: default
+default:
+	@make docker-up
 
-.PHONY: run
-run:
-	@go run cmd/server/main.go
+# Full app build in docker
+
+.PHONY: docker-up
+docker:
+	@docker-compose --env-file ./.env up --build
+
+.PHONY: docker-down
+docker-down:
+	@docker-compose --env-file ./.env down
+
+.PHONY: docker-restart
+docker-restart:
+	@docker-compose --env-file ./.env restart
+
+# Individual docker builds
 
 .PHONY: server
 server:
@@ -23,37 +34,25 @@ storage:
 worker:
 	@docker-compose --env-file ./.env up --build worker
 
-.PHONY: docker
-docker:
-	@docker-compose --env-file ./.env up --build
+.PHONY: rabbitmq
+rabbitmq:
+	@docker-compose --env-file ./.env up --build rabbitmq
 
-.PHONY: docker-down
-docker-down:
-	@docker-compose --env-file ./.env down
+# Individual local builds
 
-.PHONY: docker-restart
-docker-restart:
-	@docker-compose --env-file ./.env restart
-
-.PHONY: start-queue
-start-queue:
-	@docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-
-.PHONY: start-server
-start-server:
-	@go run cmd/server/main.go
-
-.PHONY: start-server-migrate
-start-server-migrate:
-	@go run cmd/server/main.go -m
-
-.PHONY: start-storage
-start-storage:
+.PHONY: local-server
+local-server:
 	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
 
-.PHONY: start-worker
-start-worker:
-	@go run $$(ls -1 ./cmd/worker/*.go | grep -v _test.go)
+.PHONY: local-storage
+local-storage:
+	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
+
+.PHONY: local-worker
+local-worker:
+	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
+
+# Test commands
 
 .PHONY: test
 test:
@@ -63,9 +62,13 @@ test:
 tests:
 	@go test -v -timeout 30s ./...
 
+# Serve docs
+
 .PHONY: docs
 docs:
 	@godoc -http=localhost:9995
+
+# e2e
 
 .PHONY: post-user
 post-user:
@@ -78,8 +81,3 @@ post-login:
 .PHONY: post-avatar
 post-avatar:
 	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
-
-
-.PHONY: truc
-truc:
-	@echo "${$1}"
