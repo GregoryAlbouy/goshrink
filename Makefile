@@ -67,17 +67,3 @@ tests:
 .PHONY: docs
 docs:
 	@godoc -http=localhost:9995
-
-# e2e
-
-.PHONY: post-user
-post-user:
-	@curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "email": "admin@goshrink.com", "password": "password"}' http://localhost:9999/users
-
-.PHONY: post-login
-post-login:
-	 curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "password": "password"}' http://localhost:9999/login
-
-.PHONY: post-avatar
-post-avatar:
-	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/avatar
