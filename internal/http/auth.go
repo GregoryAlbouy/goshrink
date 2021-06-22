@@ -34,6 +34,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	creds := &Creds{}
 	if err := decodeBody(r.Body, creds); err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
+		return
 	}
 
 	u, err := s.UserService.FindCreds(creds.Username)

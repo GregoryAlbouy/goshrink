@@ -23,6 +23,7 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 	u := userFromContext(r.Context())
 	if u.ID != id {
 		respondHTTPError(w, ErrUnauthorized)
+		return
 	}
 
 	file, _, err := r.FormFile("image")
