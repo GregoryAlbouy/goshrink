@@ -19,6 +19,10 @@ mysql:
 storage:
 	@docker-compose --env-file ./.env up --build storage
 
+.PHONY: worker
+worker:
+	@docker-compose --env-file ./.env up --build worker
+
 .PHONY: docker
 docker:
 	@docker-compose --env-file ./.env up --build --detach

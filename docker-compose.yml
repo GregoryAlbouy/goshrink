@@ -54,16 +54,14 @@ services:
     networks: [goshrink]
     ports: ["${STORAGE_SERVER_PORT}:${STORAGE_SERVER_PORT}"]
 
+  worker:
+    container_name: goshrink_worker
+    build: 
+      context: "."
+      dockerfile: ./build/worker.Dockerfile
+    depends_on: [mysql, rabbitmq]
+    networks: [goshrink]
+
 networks:
   goshrink:
     driver: bridge
-
-  # worker:
-  #   container_name: goshrink_worker
-  #   depends_on: [mysql, rabbitmq]
-  #   ports: [9998:80]
-
-
-
-# volumes:
-#   dbdata:
