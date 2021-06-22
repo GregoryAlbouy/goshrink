@@ -33,7 +33,7 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 go get -u
 ```
 
-> Note: Go version 1.15 minimum is required.
+> Note: Go version 1.16 minimum is required.
 
 ### Set up
 
