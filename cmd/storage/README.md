@@ -13,7 +13,7 @@ It is a public endpoint, anybody can retrieve and view a user's avatar.
 Request:
 
 ```sh
-curl -X GET http://localhost:9999/storage/sample.png
+curl -X GET http://localhost:9999/storage/<user_id>/<file_uuid>.png
 ```
 
 Response:
@@ -25,7 +25,9 @@ Response:
 
 ### Upload an image
 
-It a restricted route, only our worker can access it. It need to provide an API key in the request Authorization headers.
+It is a restricted route, only our worker can access it. It needs to provide an API key in the request Authorization headers.
+
+Only one image is stored on the server for one user at a time. If a user uploads a new image, it will overwrite the image currently stored if it exists.
 
 Request:
 

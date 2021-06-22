@@ -17,7 +17,7 @@ The package also provides its own error definitions and methods in `error.go`.
 Request:
 
 ```sh
-curl -X GET http://localhost:9999/users/1
+curl -X GET http://localhost:9999/users/<username>
 ```
 
 Response:
@@ -25,8 +25,8 @@ Response:
 ```json
 {
   "id": 1,
-  "username": "Bret",
-  "email": "Sincere@april.biz",
+  "username": "guest",
+  "email": "guest@goshrink.com",
   "avatar_url": ""
 }
 ```
@@ -66,8 +66,7 @@ Response:
 Request:
 
 ```sh
-curl -X POST -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjQxODMzMjAsImp0aSI6IjEifQ.gl2EQWCxszEHXkQkR4HIAhyhIxwufowdlaNJSOtIYek" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/users/1/avatar
-
+curl -X POST -H "Authorization: Bearer <token>" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.jpeg" http://localhost:9999/avatar
 ```
 
 Response:

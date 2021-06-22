@@ -9,10 +9,9 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 ## Table of contents <!-- omit in toc -->
 
 - [Getting started](#getting-started)
-  - [Installing dependencies](#installing-dependencies)
-  - [Set up](#set-up)
-  - [Run the project](#run-the-project)
-  - [Call the endpoints for quick testing](#call-the-endpoints-for-quick-testing)
+  - [Installation and dependencies](#installation-and-dependencies)
+  - [Run the project with Docker Compose](#run-the-project-with-docker-compose)
+  - [Quick manual testing with provided scripts](#quick-manual-testing-with-provided-scripts)
 - [Infrastructure](#infrastructure)
   - [The API server](#the-api-server)
   - [The message broker](#the-message-broker)
@@ -29,17 +28,9 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 
 ## Getting started
 
-### Installing dependencies
+### Installation and dependencies
 
-```sh
-go get -u
-```
-
-> Note: Go version 1.16 minimum is required.
-
-### Set up
-
-> Note: you must be able to run Docker and Docker Compose on your local machine to run this app. Refer to the [Get Docker](https://docs.docker.com/get-docker/) and [Install Docker Compose](https://docs.docker.com/compose/install/) docs for their installation.
+You must be able to run Docker and Docker Compose on your local machine to run this app. Refer to the [Get Docker](https://docs.docker.com/get-docker/) and [Install Docker Compose](https://docs.docker.com/compose/install/) docs for their installation.
 
 You must provide a `.env` file inside the root directory.
 For a quick start, you can use the values from the provided example:
@@ -48,71 +39,71 @@ For a quick start, you can use the values from the provided example:
 echo "$(cat .env.example)" >> .env
 ```
 
-Set up and run the MySQL docker instance:
+### Run the project with Docker Compose
+
+The app is fully dockerized. To start all instances required, simply run:
 
 ```sh
-make docker
+make
+# or make docker-up
 ```
 
-The storage server expects to store and serve images from `./storage`. You must create this folder, from the root run:
+To stop run:
 
 ```sh
-mkdir storage
+make docker-down
 ```
 
-### Run the project
-
-This project uses 3 executables and one instance of a message queue. You need to run them all at the same time.
-
-#### Message queue <!-- omit in toc -->
-
-The message queue must be up and running before anything else.
+To restart run:
 
 ```sh
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+make docker-restart
 ```
 
-#### API server <!-- omit in toc -->
+You can also run each service individually in Docker:
 
 ```sh
-make start-server
+make [service]
 ```
 
-#### Static file server <!-- omit in toc -->
+> Refer to [Makefile](/Makefile) for a reference of our scripts.
+
+### Quick manual testing with provided scripts
+
+In order to showcase the main point of this project, we provide some handy scripts in the for quick manual tests.
+
+These scripts are only concerned with login you in as our test user and making an upload request as them.
+
+Create a new user (`email` can be omitted as it is not relevant to our usecase).
 
 ```sh
-make start-storage
+./scripts/post-user <username> <password> [<email>]
+# 201 Created
 ```
 
-#### Worker <!-- omit in toc -->
+Login in as that user.
 
 ```sh
-make start-worker
+./scripts/post-login <username> <password>
+# {"access_token": "<token>"}
 ```
 
-### Call the endpoints for quick testing
-
-In order to showcase the main point of this project, we provide 2 handy scripts in the [Makefile](/Makefile) for quick tests.
-
-These scripts are only concerned with login you in and making an upload request as that user. They are written to work with our dummy user _Bret_.
+Upload an avatar (`filepath` is defaulted to `fixtures/sample.png` if not specified).
 
 ```sh
-make login
-# {"access_token": "<your_token>"}
-
-t=<your_token> make post-avatar
+./scripts/post-avatar <token> [<filepath>]
 # 202 Accepted
 ```
 
 You can now get the updated user and open in your browser the URL to see the processed image.
 
 ```sh
-curl http://localhost:9999/users/1
+curl http://localhost:9999/users/<username>
 # {
 #   "id":1,
-#   "username":"Bret",
-#   "email":"Sincere@april.biz",
-#   "avatar_url":"http://localhost:9998/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
+#   "username":"amdin",
+#   "email":"admin@goshrink.com",
+#   "avatar_url":"http://localhost:9998/storage/1/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
 # }
 ```
 
@@ -147,7 +138,7 @@ It leverages two customs modules, `queue` package built ontop of [streadway/amqp
 The main work flow of this project is the request for a user to upload an avatar.
 
 ```txt
-POST /api/v1/users/{ID}/avatar
+POST /avatar
 
 content type: multipart/form-data
 body: <image_file>
@@ -171,8 +162,8 @@ The main functional packages for the project are:
 │   ├── database
 │   └── http
 └── pkg
-    ├── queue
-    └── image
+    ├── imaging
+    └── queue
 ```
 
 ### `internal`
