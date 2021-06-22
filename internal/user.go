@@ -26,7 +26,10 @@ type UserService interface {
 	// FindByID retrieves a user by its ID.
 	FindByID(id int) (User, error)
 
-	// FindCreds retrieves a user credentials by its username.
+	// FindByUsername retrieves a user by its username.
+	FindByUsername(username string) (User, error)
+
+	// FindCreds retrieves a user credentials (id, username and password).
 	FindCreds(username string) (User, error)
 
 	// SetAvatarURL assigns to a user's avatar field the given avatar URL.
@@ -34,9 +37,6 @@ type UserService interface {
 
 	// InsertOne inserts a user in the database.
 	InsertOne(u User) error
-
-	// Migrate inserts the given users in the database.
-	Migrate(users []*User) error
 }
 
 func NewUser(in UserInput) *User {
@@ -49,7 +49,7 @@ func NewUser(in UserInput) *User {
 
 func (u User) Validate() error {
 	return validation.ValidateStruct(&u,
-		validation.Field(&u.Email, validation.Required, is.EmailFormat),
+		validation.Field(&u.Email, is.EmailFormat),
 		validation.Field(&u.Password, validation.Required, validation.Length(8, 50)),
 		validation.Field(&u.Username, validation.Required, is.Alphanumeric, validation.Length(3, 20)),
 	)

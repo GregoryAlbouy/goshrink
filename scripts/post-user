@@ -1,0 +1,8 @@
+#! /bin/bash
+
+# usage: post-user <username> <password> [<email>]
+
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"username\": \"$1\", \"password\": \"$2\", \"email\": \"$3\"}" \
+    http://localhost:9999/users

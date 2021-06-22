@@ -1,0 +1,8 @@
+#! /bin/bash
+
+# usage: post-login <username> <password>
+
+curl -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"username\": \"$1\", \"password\": \"$2\"}" \
+    http://localhost:9999/login

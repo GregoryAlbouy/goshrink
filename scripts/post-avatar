@@ -1,0 +1,16 @@
+#! /bin/bash
+
+# usage: post-avatar <auth_token> <file_path>
+
+default_filepath=fixtures/sample.png
+filepath="$2"
+
+if [ -z "$filepath" ]; then
+    filepath="$default_filepath"
+fi
+
+curl -X POST \
+    -H "Authorization:Bearer $1" \
+    -H "Content-Type:multipart/form-data" \
+    -F "image=@$filepath" \
+    http://localhost:9999/avatar
