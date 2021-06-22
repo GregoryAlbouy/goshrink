@@ -20,8 +20,8 @@ var env = map[string]string{
 	"MYSQL_DATABASE":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
-	"STATIC_SERVER_KEY":   "",
-	"STATIC_SERVER_URL":   "",
+	"STORAGE_SERVER_KEY":  "",
+	"STORAGE_SERVER_URL":  "",
 }
 
 func main() {

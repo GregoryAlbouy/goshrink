@@ -1,6 +1,6 @@
-# Static file server
+# Storage server
 
-The package `server` holds the code necessary to create and run a server capable of storing and serving static files.
+The package `storage` holds the code necessary to create and run a server capable of storing and serving static files.
 
 For a production-level project, this role would be delegated to a cloud solution.
 

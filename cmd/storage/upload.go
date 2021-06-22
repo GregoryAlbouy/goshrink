@@ -55,13 +55,13 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 
 // buildFilepath efficiently builds a filepath string from the given filename.
 func buildFilepath(filename string) string {
-	parts := []string{env["STATIC_FILE_PATH"], "/", filename}
+	parts := []string{env["STORAGE_FILE_PATH"], "/", filename}
 	return buildString(parts...)
 }
 
 // buildFileURL efficiently builds a file URL string from the given filepath.
 func buildFileURL(filepath string) string {
-	parts := []string{"http://localhost", ":", env["STATIC_SERVER_PORT"], "/", filepath}
+	parts := []string{"http://localhost", ":", env["STORAGE_SERVER_PORT"], "/", filepath}
 	return buildString(parts...)
 }
 
@@ -87,7 +87,7 @@ func requireAPIKey(next http.HandlerFunc) http.HandlerFunc {
 
 		key := strings.TrimPrefix(v, bearer)
 
-		if key != env["STATIC_SERVER_KEY"] {
+		if key != env["STORAGE_SERVER_KEY"] {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}

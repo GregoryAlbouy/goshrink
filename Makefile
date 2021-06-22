@@ -39,9 +39,9 @@ start-server:
 start-server-migrate:
 	@go run cmd/server/main.go -m
 
-.PHONY: start-static
-start-static:
-	@go run $$(ls -1 ./cmd/static/*.go | grep -v _test.go)
+.PHONY: start-storage
+start-storage:
+	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
 
 .PHONY: start-worker
 start-worker:
