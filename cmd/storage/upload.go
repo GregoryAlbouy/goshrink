@@ -18,6 +18,15 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// userID, file, filename, err := formValues()
+
+	// Retrieve user ID
+	userID := r.FormValue("userId")
+	if userID == "" {
+		http.Error(w, "missing user id", http.StatusBadRequest)
+		return
+	}
+
 	// Retrieve the file
 	file, headers, err := r.FormFile("image")
 	if err != nil {
@@ -32,9 +41,22 @@ func handleImageUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filepath := buildFilepath(headers.Filename)
+	// Delete user directory
+	dirPath := buildString(env["STORAGE_FILE_PATH"], "/", userID)
+	if err := os.RemoveAll(dirPath); err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
+	// Create user directory
+	if err := os.Mkdir(dirPath, os.ModeDir); err != nil {
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
 
 	// Create a destination on disk
+	filename := headers.Filename
+	filepath := buildString(dirPath, "/", filename)
 	dst, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		http.Error(w, "internal error: failed to create file", http.StatusInternalServerError)
