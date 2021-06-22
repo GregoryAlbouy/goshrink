@@ -80,4 +80,4 @@ post-login:
 
 .PHONY: post-avatar
 post-avatar:
-	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
+	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/avatar
