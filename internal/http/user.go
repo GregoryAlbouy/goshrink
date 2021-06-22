@@ -55,5 +55,5 @@ func (s *Server) handleUserCreate(w http.ResponseWriter, r *http.Request) {
 		respondHTTPError(w, ErrInternal)
 		return
 	}
-	respondJSON(w, 201, "Created\n")
+	respondJSON(w, 201, "Created")
 }

@@ -39,5 +39,5 @@ func (s *Server) handleAvatarUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondJSON(w, 202, "Accepted\n")
+	respondJSON(w, 202, "Accepted")
 }
