@@ -33,12 +33,6 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 
 You must be able to run Docker and Docker Compose on your local machine to run this app. Refer to the [Get Docker](https://docs.docker.com/get-docker/) and [Install Docker Compose](https://docs.docker.com/compose/install/) docs for their installation.
 
-Install Go module dependencies:
-
-```sh
-go get -u
-```
-
 You must provide a `.env` file inside the root directory.
 For a quick start, you can use the values from the provided example:
 
@@ -80,7 +74,13 @@ make [entity]
 
 ### Run in development mode
 
-In dev mode, you might want to use the Go command to run each part individually. For this, we also provide scripts to run them using the `go run` command.
+Before running in dev mode, make sure you installed Go module dependencies.
+
+```sh
+go get -u
+```
+
+You might want to use the Go command to run each part individually. For this, we also provide scripts to run them using the `go run` command.
 
 ```sh
 make local-[entity]
