@@ -58,8 +58,6 @@ func run(envPath string, migrate bool) error {
 	}
 	defer qp.CloseConnection()
 
-	queue.SetQueueName(env["QUEUE_NAME"])
-
 	srv := initServer(db, qp)
 
 	if err := srv.Start(); err != nil {
