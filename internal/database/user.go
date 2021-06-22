@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
+	"github.com/gregoryalbouy/goshrink/internal"
 	"github.com/jmoiron/sqlx"
 )
 

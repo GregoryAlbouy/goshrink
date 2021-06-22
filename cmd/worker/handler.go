@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
 	"github.com/google/uuid"
+	"github.com/gregoryalbouy/goshrink/internal"
 	"github.com/streadway/amqp"
 )
 

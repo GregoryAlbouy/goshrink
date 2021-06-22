@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
+	"github.com/gregoryalbouy/goshrink/pkg/crypto"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyz" +

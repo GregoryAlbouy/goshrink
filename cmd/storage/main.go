@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
-	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
+	"github.com/gregoryalbouy/goshrink/pkg/dotenv"
+	"github.com/gregoryalbouy/goshrink/pkg/httputil"
 )
 
 const defaultEnvPath = "./.env"

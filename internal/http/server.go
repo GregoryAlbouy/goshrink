@@ -4,11 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
-	"github.com/GregoryAlbouy/shrinker/pkg/queue"
-	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
 	"github.com/gorilla/mux"
+	"github.com/gregoryalbouy/goshrink/internal"
+	"github.com/gregoryalbouy/goshrink/pkg/httputil"
+	"github.com/gregoryalbouy/goshrink/pkg/queue"
+	"github.com/gregoryalbouy/goshrink/pkg/simplejwt"
 )
 
 type Server struct {

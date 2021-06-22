@@ -1,6 +1,6 @@
-# Shrinker <!-- omit in toc -->
+# Goshrink <!-- omit in toc -->
 
-Shrinker is an application that uses a message broker to offload image processing tasks from a web API to a dedicated worker.
+Goshrink is an application that uses a message broker to offload image processing tasks from a web API to a dedicated worker.
 
 Authenticated users can make request to the API server to upload image file as their avatar. The images are resized to a smaller scale and saved to a file storage to be viewable by anyone.
 

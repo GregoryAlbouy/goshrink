@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/GregoryAlbouy/shrinker/pkg/imaging"
+	"github.com/gregoryalbouy/goshrink/pkg/imaging"
 )
 
 const imageFormat = imaging.PNGFormat // TODO: make it actionnable

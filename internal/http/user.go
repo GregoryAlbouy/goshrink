@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
+	"github.com/gregoryalbouy/goshrink/internal"
+	"github.com/gregoryalbouy/goshrink/pkg/crypto"
 )
 
 // registerUserRoutes is a helper function for registering all user routes.

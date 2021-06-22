@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/GregoryAlbouy/shrinker/internal"
-	"github.com/GregoryAlbouy/shrinker/pkg/crypto"
-	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
-	"github.com/GregoryAlbouy/shrinker/pkg/simplejwt"
+	"github.com/gregoryalbouy/goshrink/internal"
+	"github.com/gregoryalbouy/goshrink/pkg/crypto"
+	"github.com/gregoryalbouy/goshrink/pkg/httputil"
+	"github.com/gregoryalbouy/goshrink/pkg/simplejwt"
 )
 
 type Creds struct {
