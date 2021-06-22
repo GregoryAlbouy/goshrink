@@ -4,9 +4,9 @@ import (
 	"flag"
 	"log"
 
-	"github.com/GregoryAlbouy/shrinker/internal/database"
-	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
-	"github.com/GregoryAlbouy/shrinker/pkg/queue"
+	"github.com/gregoryalbouy/goshrink/internal/database"
+	"github.com/gregoryalbouy/goshrink/pkg/dotenv"
+	"github.com/gregoryalbouy/goshrink/pkg/queue"
 	"github.com/streadway/amqp"
 )
 

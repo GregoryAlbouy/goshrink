@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/pkg/httputil"
-	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
+	"github.com/gregoryalbouy/goshrink/pkg/httputil"
+	"github.com/gregoryalbouy/goshrink/pkg/mimetype"
 )
 
 func handleImageUpload(w http.ResponseWriter, r *http.Request) {

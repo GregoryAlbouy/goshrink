@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/GregoryAlbouy/shrinker/pkg/mimetype"
+	"github.com/gregoryalbouy/goshrink/pkg/mimetype"
 )
 
 // registerAvatarRoutes is a helper function for registering all avatar routes.
