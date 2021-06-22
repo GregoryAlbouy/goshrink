@@ -185,8 +185,8 @@ The main functional packages for the project are:
 │   ├── database
 │   └── http
 └── pkg
-    ├── queue
-    └── image
+    ├── imaging
+    └── queue
 ```
 
 ### `internal`
