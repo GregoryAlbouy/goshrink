@@ -1,15 +1,12 @@
-.PHONY: start
-start:
-	@make docker && \
-	make run
+.PHONY: default
+default:
+	@make docker-up
 
-.PHONY: run
-run:
-	@go run cmd/server/main.go
+# Full app build in docker
 
-.PHONY: docker
+.PHONY: docker-up
 docker:
-	@docker-compose --env-file ./.env up -d
+	@docker-compose --env-file ./.env up --build
 
 .PHONY: docker-down
 docker-down:
@@ -19,37 +16,43 @@ docker-down:
 docker-restart:
 	@docker-compose --env-file ./.env restart
 
-.PHONY: start-queue
-start-queue:
-	@docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+# Individual docker builds
 
-.PHONY: start-server
-start-server:
-	@go run cmd/server/main.go
+.PHONY: server
+server:
+	@docker-compose --env-file ./.env up --build server
 
-.PHONY: start-server-migrate
-start-server-migrate:
-	@go run cmd/server/main.go -m
+.PHONY: mysql
+mysql:
+	@docker-compose --env-file ./.env up --build mysql
 
-.PHONY: start-static
-start-static:
-	@go run $$(ls -1 ./cmd/static/*.go | grep -v _test.go)
+.PHONY: storage
+storage:
+	@docker-compose --env-file ./.env up --build storage
 
-.PHONY: start-worker
-start-worker:
-	@go run $$(ls -1 ./cmd/worker/*.go | grep -v _test.go)
+.PHONY: worker
+worker:
+	@docker-compose --env-file ./.env up --build worker
 
-.PHONY: post-guest
-post-guest:
-	curl -X POST -H "Content-Type:application/json" -d '{"username": "guest", "email": "guest@goshrink.com", "password": "password"}' http://localhost:9999/users
+.PHONY: rabbitmq
+rabbitmq:
+	@docker-compose --env-file ./.env up --build rabbitmq
 
-.PHONY: login
-login:
-	 curl -X POST -H "Content-Type: application/json" -d '{"username": "Bret", "password": "password"}' http://localhost:9999/login
+# Individual local builds
 
-.PHONY: post-avatar
-post-avatar:
-	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
+.PHONY: local-server
+local-server:
+	@go run $$(ls -1 ./cmd/server/*.go | grep -v _test.go)
+
+.PHONY: local-storage
+local-storage:
+	@go run $$(ls -1 ./cmd/storage/*.go | grep -v _test.go)
+
+.PHONY: local-worker
+local-worker:
+	@go run $$(ls -1 ./cmd/local/*.go | grep -v _test.go)
+
+# Test commands
 
 .PHONY: test
 test:
@@ -59,6 +62,22 @@ test:
 tests:
 	@go test -v -timeout 30s ./...
 
+# Serve docs
+
 .PHONY: docs
 docs:
 	@godoc -http=localhost:9995
+
+# e2e
+
+.PHONY: post-user
+post-user:
+	@curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "email": "admin@goshrink.com", "password": "password"}' http://localhost:9999/users
+
+.PHONY: post-login
+post-login:
+	 curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "password": "password"}' http://localhost:9999/login
+
+.PHONY: post-avatar
+post-avatar:
+	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar

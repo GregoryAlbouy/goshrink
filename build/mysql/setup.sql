@@ -1,16 +1,16 @@
-package database
+CREATE DATABASE IF NOT EXISTS goshrink;
+USE goshrink;
 
-const userSchema = `
+-- user table
 CREATE TABLE IF NOT EXISTS user (
 	id INT UNSIGNED AUTO_INCREMENT,
 	username VARCHAR(20) UNIQUE,
 	password VARCHAR(255),
 	email VARCHAR(255) UNIQUE,
 	PRIMARY KEY (id)
-)
-`
+);
 
-const avatarSchema = `
+-- avatar table
 CREATE TABLE IF NOT EXISTS avatar (
 	id INT UNSIGNED AUTO_INCREMENT,
 	user_id INT UNSIGNED UNIQUE,
@@ -20,12 +20,11 @@ CREATE TABLE IF NOT EXISTS avatar (
 		FOREIGN KEY (user_id)
 		REFERENCES user(id)
 		ON DELETE CASCADE
-)`
+);
 
-const userAvatarSchema = `
+-- V_user_avatar view
 CREATE OR REPLACE VIEW V_user_avatar
 AS SELECT u.id, u.username, u.email, COALESCE(a.avatar_url, '') AS avatar_url
 FROM user u
 LEFT JOIN avatar a
-	ON u.id = a.user_id
-`
+	ON u.id = a.user_id;

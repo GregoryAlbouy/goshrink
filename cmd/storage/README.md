@@ -1,6 +1,6 @@
-# Static file server
+# Storage server
 
-The package `server` holds the code necessary to create and run a server capable of storing and serving static files.
+The package `storage` holds the code necessary to create and run a server capable of storing and serving static files.
 
 For a production-level project, this role would be delegated to a cloud solution.
 
@@ -30,7 +30,7 @@ It a restricted route, only our worker can access it. It need to provide an API 
 Request:
 
 ```sh
-curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:8000/storage/avatar
+curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:9998/storage/avatar
 ```
 
 Response:

@@ -37,7 +37,7 @@ go run cmd/server/main.go -m
 
 <!-- Message queue docker set up here -->
 
-The static file server expects to store and serve images from `./storage`. You must create this folder, from the root run:
+The storage server expects to store and serve images from `./storage`. You must create this folder, from the root run:
 
 ```sh
 mkdir storage
@@ -64,7 +64,7 @@ make start-server
 #### Static file server
 
 ```sh
-make start-static
+make start-storage
 ```
 
 #### Worker
@@ -95,7 +95,7 @@ curl http://localhost:9999/users/1
 #   "id":1,
 #   "username":"Bret",
 #   "email":"Sincere@april.biz",
-#   "avatar_url":"http://localhost:8000/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
+#   "avatar_url":"http://localhost:9998/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
 # }
 ```
 
@@ -146,7 +146,7 @@ The main functional packages for the project are:
 .
 ├── cmd
 │   ├── server
-│   ├── static
+│   ├── storage
 │   └── worker
 ├── internal
 │   ├── database
@@ -176,5 +176,5 @@ Also, sub-packages have their own documentation when relevant that you may refer
 
 - [http](internal/http/README.md) (comes with handy curl commands)
 - [database](internal/database/README.md)
-- [static](cmd/static/README.md)
+- [storage](cmd/storage/README.md)
 - [queue](pkg/queue/README.md)
