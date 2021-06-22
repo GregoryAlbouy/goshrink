@@ -34,6 +34,14 @@ func (s *userService) FindByUsername(username string) (internal.User, error) {
 func (s *userService) find(col string, val interface{}) (internal.User, error) {
 	u := internal.User{}
 
+	var acceptableCol = map[string]bool{
+		"username": true,
+		"id":       true,
+	}
+	if _, ok := acceptableCol[col]; !ok {
+		return u, fmt.Errorf("illegal column %s", col)
+	}
+
 	if err := s.db.Get(
 		&u,
 		fmt.Sprintf("SELECT * FROM V_user_avatar WHERE %s = ?", col),
