@@ -37,9 +37,6 @@ type UserService interface {
 
 	// InsertOne inserts a user in the database.
 	InsertOne(u User) error
-
-	// Migrate inserts the given users in the database.
-	Migrate(users []*User) error
 }
 
 func NewUser(in UserInput) *User {

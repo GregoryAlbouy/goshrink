@@ -5,7 +5,6 @@ WORKDIR /go/src/goshrink
 COPY cmd/server cmd/server
 COPY internal internal
 COPY pkg pkg
-COPY mock mock
 COPY go.mod go.mod
 COPY go.sum go.sum
 COPY .env .env

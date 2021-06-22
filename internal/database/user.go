@@ -87,14 +87,3 @@ func (s *userService) InsertOne(u internal.User) error {
 
 	return nil
 }
-
-// Migrate inserts the given users in the database.
-func (s *userService) Migrate(users []*internal.User) error {
-	for _, u := range users {
-		if err := s.InsertOne(*u); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
