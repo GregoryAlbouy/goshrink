@@ -9,10 +9,10 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 ## Table of contents <!-- omit in toc -->
 
 - [Getting started](#getting-started)
-  - [Installing dependencies](#installing-dependencies)
-  - [Set up](#set-up)
-  - [Run the project](#run-the-project)
-  - [Call the endpoints for quick testing](#call-the-endpoints-for-quick-testing)
+  - [Installation and dependencies](#installation-and-dependencies)
+  - [Run the project with Docker Compose](#run-the-project-with-docker-compose)
+  - [Run in development mode](#run-in-development-mode)
+  - [Quick manual testing with provided scripts](#quick-manual-testing-with-provided-scripts)
 - [Infrastructure](#infrastructure)
   - [The API server](#the-api-server)
   - [The message broker](#the-message-broker)
@@ -29,17 +29,15 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 
 ## Getting started
 
-### Installing dependencies
+### Installation and dependencies
+
+You must be able to run Docker and Docker Compose on your local machine to run this app. Refer to the [Get Docker](https://docs.docker.com/get-docker/) and [Install Docker Compose](https://docs.docker.com/compose/install/) docs for their installation.
+
+Install Go module dependencies:
 
 ```sh
 go get -u
 ```
-
-> Note: Go version 1.16 minimum is required.
-
-### Set up
-
-> Note: you must be able to run Docker and Docker Compose on your local machine to run this app. Refer to the [Get Docker](https://docs.docker.com/get-docker/) and [Install Docker Compose](https://docs.docker.com/compose/install/) docs for their installation.
 
 You must provide a `.env` file inside the root directory.
 For a quick start, you can use the values from the provided example:
@@ -48,64 +46,63 @@ For a quick start, you can use the values from the provided example:
 echo "$(cat .env.example)" >> .env
 ```
 
-Set up and run the MySQL docker instance:
-
-```sh
-make docker
-```
-
-Once the instance is ready, run the executable with `-m` flag to perform mock migrations:
-
-```sh
-go run cmd/server/main.go -m
-```
-
-<!-- Message queue docker set up here -->
-
-The storage server expects to store and serve images from `./storage`. You must create this folder, from the root run:
+The storage server expects to store and serve images from `./storage`. You must create this directory at the root of the project:
 
 ```sh
 mkdir storage
 ```
 
-### Run the project
+### Run the project with Docker Compose
 
-This project uses 3 executables and one instance of a message queue. You need to run them all at the same time.
-
-#### Message queue <!-- omit in toc -->
-
-The message queue must be up and running before anything else.
+The app is fully dockerized. To start all instances required, simply run:
 
 ```sh
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+make docker-up
 ```
 
-#### API server <!-- omit in toc -->
+To stop run:
 
 ```sh
-make start-server
+make docker-down
 ```
 
-#### Static file server <!-- omit in toc -->
+To restart run:
 
 ```sh
-make start-storage
+make docker-restart
 ```
 
-#### Worker <!-- omit in toc -->
+You can also run each entity individually in Docker:
 
 ```sh
-make start-worker
+make [entity]
 ```
 
-### Call the endpoints for quick testing
+### Run in development mode
 
-In order to showcase the main point of this project, we provide 2 handy scripts in the [Makefile](/Makefile) for quick tests.
-
-These scripts are only concerned with login you in and making an upload request as that user. They are written to work with our dummy user _Bret_.
+In dev mode, you might want to use the Go command to run each part individually. For this, we also provide scripts to run them using the `go run` command.
 
 ```sh
-make login
+make local-[entity]
+# alias to go run ./cmd/entity/main.go
+```
+
+Note that the MySQL and RabbitMQ instances are always run through docker-compose using `make rabbitmq` and `make mysql`.
+
+> Refer to [Makefile](/Makefile) for a reference of our scripts.
+
+### Quick manual testing with provided scripts
+
+In order to showcase the main point of this project, we provide some handy scripts in the for quick manual tests.
+
+These scripts are only concerned with login you in as our test user and making an upload request as them.
+
+> ```sh
+> make post-user
+> ```
+
+```sh
+make post-login
 # {"access_token": "<your_token>"}
 
 t=<your_token> make post-avatar
@@ -118,8 +115,8 @@ You can now get the updated user and open in your browser the URL to see the pro
 curl http://localhost:9999/users/1
 # {
 #   "id":1,
-#   "username":"Bret",
-#   "email":"Sincere@april.biz",
+#   "username":"amdin",
+#   "email":"admin@goshrink.com",
 #   "avatar_url":"http://localhost:9998/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
 # }
 ```
