@@ -11,7 +11,6 @@ We currently support images uploaded in `.png` or `.jpeg` format.
 - [Getting started](#getting-started)
   - [Installation and dependencies](#installation-and-dependencies)
   - [Run the project with Docker Compose](#run-the-project-with-docker-compose)
-  - [Run in development mode](#run-in-development-mode)
   - [Quick manual testing with provided scripts](#quick-manual-testing-with-provided-scripts)
 - [Infrastructure](#infrastructure)
   - [The API server](#the-api-server)
@@ -40,18 +39,13 @@ For a quick start, you can use the values from the provided example:
 echo "$(cat .env.example)" >> .env
 ```
 
-The storage server expects to store and serve images from `./storage`. You must create this directory at the root of the project:
-
-```sh
-mkdir storage
-```
-
 ### Run the project with Docker Compose
 
 The app is fully dockerized. To start all instances required, simply run:
 
 ```sh
-make docker-up
+make
+# or make docker-up
 ```
 
 To stop run:
@@ -66,28 +60,11 @@ To restart run:
 make docker-restart
 ```
 
-You can also run each entity individually in Docker:
+You can also run each service individually in Docker:
 
 ```sh
-make [entity]
+make [service]
 ```
-
-### Run in development mode
-
-Before running in dev mode, make sure you installed Go module dependencies.
-
-```sh
-go get -u
-```
-
-You might want to use the Go command to run each part individually. For this, we also provide scripts to run them using the `go run` command.
-
-```sh
-make local-[entity]
-# alias to go run ./cmd/entity/main.go
-```
-
-Note that the MySQL and RabbitMQ instances are always run through docker-compose using `make rabbitmq` and `make mysql`.
 
 > Refer to [Makefile](/Makefile) for a reference of our scripts.
 
@@ -126,7 +103,7 @@ curl http://localhost:9999/users/<username>
 #   "id":1,
 #   "username":"amdin",
 #   "email":"admin@goshrink.com",
-#   "avatar_url":"http://localhost:9998/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
+#   "avatar_url":"http://localhost:9998/storage/1/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
 # }
 ```
 
@@ -161,7 +138,7 @@ It leverages two customs modules, `queue` package built ontop of [streadway/amqp
 The main work flow of this project is the request for a user to upload an avatar.
 
 ```txt
-POST /api/avatar
+POST /avatar
 
 content type: multipart/form-data
 body: <image_file>
