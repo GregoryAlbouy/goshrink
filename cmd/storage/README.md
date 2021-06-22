@@ -25,7 +25,7 @@ Response:
 
 ### Upload an image
 
-It a restricted route, only our worker can access it. It needs to provide an API key in the request Authorization headers.
+It is a restricted route, only our worker can access it. It needs to provide an API key in the request Authorization headers.
 
 Only one image is stored on the server for one user at a time. If a user uploads a new image, it will overwrite the image currently stored if it exists.
 
