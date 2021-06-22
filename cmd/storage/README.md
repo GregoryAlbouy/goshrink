@@ -30,7 +30,7 @@ It a restricted route, only our worker can access it. It need to provide an API 
 Request:
 
 ```sh
-curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:8000/storage/avatar
+curl -X POST -H "Authorization: Bearer goshrink" -H "Content-Type:multipart/form-data" -F "upload=@fixtures/sample.png" http://localhost:9998/storage/avatar
 ```
 
 Response:

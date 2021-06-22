@@ -15,6 +15,10 @@ server:
 mysql:
 	@docker-compose --env-file ./.env up --build mysql
 
+.PHONY: storage
+storage:
+	@docker-compose --env-file ./.env up --build storage
+
 .PHONY: docker
 docker:
 	@docker-compose --env-file ./.env up --build --detach

@@ -46,6 +46,14 @@ services:
     networks: [goshrink]
     ports: ["${API_SERVER_PORT}:${API_SERVER_PORT}"]
 
+  storage:
+    container_name: goshrink_storage
+    build:
+      context: "."
+      dockerfile: ./build/storage.Dockerfile
+    networks: [goshrink]
+    ports: ["${STORAGE_SERVER_PORT}:${STORAGE_SERVER_PORT}"]
+
 networks:
   goshrink:
     driver: bridge
@@ -55,9 +63,6 @@ networks:
   #   depends_on: [mysql, rabbitmq]
   #   ports: [9998:80]
 
-  # storage:
-  #   container_name: goshrink_storage
-  #   ports: [9997:80]
 
 
 # volumes:

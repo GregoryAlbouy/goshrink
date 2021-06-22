@@ -95,7 +95,7 @@ curl http://localhost:9999/users/1
 #   "id":1,
 #   "username":"Bret",
 #   "email":"Sincere@april.biz",
-#   "avatar_url":"http://localhost:8000/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
+#   "avatar_url":"http://localhost:9998/storage/9f31c631-a868-4727-94f5-ccd30f0e3db7.png"
 # }
 ```
 
