@@ -7,9 +7,17 @@ start:
 run:
 	@go run cmd/server/main.go
 
+.PHONY: server
+server:
+	@docker-compose --env-file ./.env up --build server
+
+.PHONY: mysql
+mysql:
+	@docker-compose --env-file ./.env up --build mysql
+
 .PHONY: docker
 docker:
-	@docker-compose --env-file ./.env up -d
+	@docker-compose --env-file ./.env up --build --detach
 
 .PHONY: docker-down
 docker-down:

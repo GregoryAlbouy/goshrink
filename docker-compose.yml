@@ -2,7 +2,10 @@ version: '3'
 
 services:
   mysql:
-    image: mysql:8
+    container_name: goshrink_mysql
+    build:
+      context: ./build/mysql
+      dockerfile: mysql.Dockerfile
     restart: always
     environment:
       - MYSQL_DATABASE
@@ -11,13 +14,51 @@ services:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_PORT
       - MYSQL_VOLUME_PATH
+    networks: [goshrink]
     ports: ["${MYSQL_PORT}:${MYSQL_PORT}"]
-    volumes:
-      - "${MYSQL_VOLUME_PATH}:/var/lib/mysql"
+    healthcheck:
+      test: ["CMD-SHELL", 'mysql --database=$$MYSQL_DATABASE --password=$$MYSQL_ROOT_PASSWORD --execute="SELECT count(table_name) > 0 FROM information_schema.tables;" --skip-column-names -B']
+      interval: 5s
+      timeout: 30s
+      retries: 10 
+    # volumes:
+    #   - dbdata: "mysql/volume:/var/lib/mysql"
 
   adminer:
+    container_name: goshrink_adminer
     depends_on: [mysql]
     image: adminer
     restart: always
-    ports:
-      - 8085:8080
+    ports: [8085:8080]
+
+  rabbitmq:
+    container_name: goshrink_rabbitmq
+    image: rabbitmq:3-management
+    networks: [goshrink]
+    ports: [5672:5672, 15672:15672]    
+
+  server:
+    container_name: goshrink_server
+    depends_on: [mysql, rabbitmq]
+    build:
+      context: "."
+      dockerfile: ./build/server.Dockerfile
+    networks: [goshrink]
+    ports: ["${API_SERVER_PORT}:${API_SERVER_PORT}"]
+
+networks:
+  goshrink:
+    driver: bridge
+
+  # worker:
+  #   container_name: goshrink_worker
+  #   depends_on: [mysql, rabbitmq]
+  #   ports: [9998:80]
+
+  # storage:
+  #   container_name: goshrink_storage
+  #   ports: [9997:80]
+
+
+# volumes:
+#   dbdata:

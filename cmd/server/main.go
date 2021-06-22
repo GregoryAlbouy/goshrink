@@ -13,12 +13,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const (
-	defaultEnvPath = "./.env"
-	defaultPort    = "80"
-)
+const defaultEnvPath = "./.env"
 
 var env = map[string]string{
+	"API_SERVER_PORT":     "",
 	"API_JWT_SECRET":      "",
 	"QUEUE_URL":           "",
 	"QUEUE_NAME":          "",
@@ -122,7 +120,7 @@ func migrateMockUsers(db *database.DB) {
 }
 
 func initServer(db *database.DB, qp queue.Producer) (*http.Server, error) {
-	addr := ":" + defaultPort
+	addr := ":" + env["API_SERVER_PORT"]
 	repo := http.Repository{
 		UserService: database.NewUserService(db),
 	}
