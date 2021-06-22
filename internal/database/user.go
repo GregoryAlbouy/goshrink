@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/GregoryAlbouy/shrinker/internal"
@@ -80,10 +81,17 @@ func (s *userService) SetAvatarURL(userID int, url string) error {
 
 // InsertOne inserts a user in the database.
 func (s *userService) InsertOne(u internal.User) error {
+	// Compute email as NULL if it is an empty string
+	email := sql.NullString{}
+	if u.Email == "" {
+		email.String = u.Email
+		email.Valid = true
+	}
+
 	// Insert user
 	if _, err := s.db.Exec(
 		"INSERT INTO user (username, email, password) VALUES (?, ?, ?)",
-		u.Username, u.Email, u.Password,
+		u.Username, email, u.Password,
 	); err != nil {
 		return err
 	}
