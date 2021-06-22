@@ -10,19 +10,19 @@ import (
 
 // registerUserRoutes is a helper function for registering all user routes.
 func (s *Server) registerUserRoutes() {
-	s.router.HandleFunc("/users/{id:[0-9]+}", s.handleUserGet).Methods("GET")
+	s.router.HandleFunc("/users/{username:[a-zA-Z0-9]+}", s.handleUserGet).Methods("GET")
 
 	s.router.HandleFunc("/users", s.handleUserCreate).Methods("POST")
 }
 
 func (s *Server) handleUserGet(w http.ResponseWriter, r *http.Request) {
-	id, err := extractID(r)
+	username, err := extractRouteParam(r, "username")
 	if err != nil {
 		respondHTTPError(w, ErrBadRequest.Wrap(err))
 		return
 	}
 
-	u, err := s.UserService.FindByID(id)
+	u, err := s.UserService.FindByUsername(username)
 	if err != nil {
 		respondHTTPError(w, ErrNotFound)
 		return

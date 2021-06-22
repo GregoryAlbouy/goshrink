@@ -2,22 +2,21 @@ package http
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
-// extractID retreives the route parameter "id" from the mux route variables.
-// Also validates the ID is an integer.
-func extractID(r *http.Request) (int, error) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		return 0, errors.New("invalid ID format")
+// extractRouteParam retreives the given route parameter from the
+// mux path variables.
+func extractRouteParam(r *http.Request, p string) (string, error) {
+	v, ok := mux.Vars(r)[p]
+	if !ok {
+		return "", fmt.Errorf("invalid route parameter for \"%s\"", p)
 	}
-	return id, nil
+	return v, nil
 }
 
 // decodeBody reads the given request body and writes the decoded data to dest.

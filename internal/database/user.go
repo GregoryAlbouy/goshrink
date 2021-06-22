@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+
 	"github.com/GregoryAlbouy/shrinker/internal"
 	"github.com/jmoiron/sqlx"
 )
@@ -21,16 +23,24 @@ func NewUserService(db *DB) internal.UserService {
 
 // FindByID retrieves a user by its ID.
 func (s *userService) FindByID(userID int) (internal.User, error) {
+	return s.find("id", userID)
+}
+
+// FindOne retrieves a user by its username.
+func (s *userService) FindByUsername(username string) (internal.User, error) {
+	return s.find("username", username)
+}
+
+func (s *userService) find(col string, val interface{}) (internal.User, error) {
 	u := internal.User{}
 
 	if err := s.db.Get(
 		&u,
-		"SELECT * FROM V_user_avatar WHERE id = ?",
-		userID,
+		fmt.Sprintf("SELECT * FROM V_user_avatar WHERE %s = ?", col),
+		val,
 	); err != nil {
 		return internal.User{}, err
 	}
-
 	return u, nil
 }
 
