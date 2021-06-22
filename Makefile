@@ -25,7 +25,7 @@ worker:
 
 .PHONY: docker
 docker:
-	@docker-compose --env-file ./.env up --build --detach
+	@docker-compose --env-file ./.env up --build
 
 .PHONY: docker-down
 docker-down:
@@ -55,18 +55,6 @@ start-storage:
 start-worker:
 	@go run $$(ls -1 ./cmd/worker/*.go | grep -v _test.go)
 
-.PHONY: post-guest
-post-guest:
-	curl -X POST -H "Content-Type:application/json" -d '{"username": "guest", "email": "guest@goshrink.com", "password": "password"}' http://localhost:9999/users
-
-.PHONY: login
-login:
-	 curl -X POST -H "Content-Type: application/json" -d '{"username": "Bret", "password": "password"}' http://localhost:9999/login
-
-.PHONY: post-avatar
-post-avatar:
-	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
-
 .PHONY: test
 test:
 	@go test -v -timeout 30s -run ${t} ./...
@@ -78,3 +66,20 @@ tests:
 .PHONY: docs
 docs:
 	@godoc -http=localhost:9995
+
+.PHONY: post-user
+post-user:
+	@curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "email": "admin@goshrink.com", "password": "password"}' http://localhost:9999/users
+
+.PHONY: post-login
+post-login:
+	 curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "password": "password"}' http://localhost:9999/login
+
+.PHONY: post-avatar
+post-avatar:
+	@curl -X POST -H "Authorization:Bearer ${t}" -H "Content-Type:multipart/form-data" -F "image=@fixtures/sample.png" http://localhost:9999/users/1/avatar
+
+
+.PHONY: truc
+truc:
+	@echo "${$1}"

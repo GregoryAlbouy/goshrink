@@ -1,6 +1,7 @@
 FROM golang:1.16-alpine AS builder
 
 WORKDIR /go/src/goshrink
+
 COPY cmd/server cmd/server
 COPY internal internal
 COPY pkg pkg
@@ -17,5 +18,5 @@ CMD ["server"]
 
 # # TODO: multistage build
 # FROM scratch
-# COPY --from=builder ["/server", "/"]
-# CMD ["server"]
+# COPY --from=builder ["/go/bin/server", "/"]
+# CMD ["/server"]

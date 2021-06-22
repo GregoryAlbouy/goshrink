@@ -1,6 +1,7 @@
 FROM golang:1.16-alpine AS builder
 
 WORKDIR /go/src/goshrink
+
 COPY cmd/storage cmd/storage
 COPY internal internal
 COPY pkg pkg
