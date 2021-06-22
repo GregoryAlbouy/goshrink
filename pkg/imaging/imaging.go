@@ -54,8 +54,11 @@ func Reader(img *image.NRGBA, fmt Format) (io.Reader, error) {
 	return bytes.NewReader(buf.Bytes()), nil
 }
 
-// Rescale sets an image width to the given value, preserving its aspect ratio.
-// It returns the modified image.
+// Rescale sets an image width to the given value, preserving its aspect ratio,
+// and returns the modified image.
+//
+// It uses the nearest neighbor algorithm since our benchmarks show it is
+// both the fastest and the cheapest in terms of resources.
 func Rescale(img image.Image, width int) *image.NRGBA {
 	return imaging.Resize(img, width, 0, imaging.NearestNeighbor)
 }
