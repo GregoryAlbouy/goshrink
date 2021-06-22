@@ -1,12 +1,10 @@
 package main
 
 import (
-	"flag"
 	"log"
 
 	"github.com/GregoryAlbouy/shrinker/internal/database"
 	"github.com/GregoryAlbouy/shrinker/internal/http"
-	"github.com/GregoryAlbouy/shrinker/mock"
 	"github.com/GregoryAlbouy/shrinker/pkg/dotenv"
 	"github.com/GregoryAlbouy/shrinker/pkg/queue"
 	"github.com/streadway/amqp"
@@ -27,17 +25,14 @@ var env = map[string]string{
 }
 
 func main() {
-	migrate := flag.Bool("m", false, "use mock users")
-	flag.Parse()
-
 	envPath := dotenv.GetPath(defaultEnvPath)
 
-	if err := run(envPath, *migrate); err != nil {
+	if err := run(envPath); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(envPath string, migrate bool) error {
+func run(envPath string) error {
 	if err := dotenv.Load(envPath, &env); err != nil {
 		return err
 	}
@@ -45,20 +40,12 @@ func run(envPath string, migrate bool) error {
 	db := mustInitDatabase()
 	defer db.Close()
 
-	// We use mock users for now for easier testing.
-	// We might implement POST endpoints for that matter in the future.
-	if migrate {
-		migrateMockUsers(db)
-	}
-
 	// Connect to the queue as close to main as possible, as we are usign `defer`.
 	qp, err := initQueue()
 	if err != nil {
 		log.Fatalf("rabbitmq error: %s", err)
 	}
 	defer qp.CloseConnection()
-
-	queue.SetQueueName(env["QUEUE_NAME"])
 
 	srv := initServer(db, qp)
 
@@ -102,17 +89,6 @@ func initQueue() (queue.Producer, error) {
 
 	log.Printf("Server connected to queue %s", env["QUEUE_NAME"])
 	return producer, nil
-}
-
-func migrateMockUsers(db *database.DB) {
-	userService := database.NewUserService(db)
-	users, err := mock.GetUsersWithHashedPasswords()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := userService.Migrate(users); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func initServer(db *database.DB, qp queue.Producer) *http.Server {

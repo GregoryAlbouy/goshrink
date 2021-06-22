@@ -4,8 +4,8 @@ USE goshrink;
 -- user table
 CREATE TABLE IF NOT EXISTS user (
 	id INT UNSIGNED AUTO_INCREMENT,
-	username VARCHAR(20) UNIQUE,
-	password VARCHAR(255),
+	username VARCHAR(20) UNIQUE NOT NULL,
+	password VARCHAR(255) NOT NULL,
 	email VARCHAR(255) UNIQUE,
 	PRIMARY KEY (id)
 );

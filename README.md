@@ -54,14 +54,6 @@ Set up and run the MySQL docker instance:
 make docker
 ```
 
-Once the instance is ready, run the executable with `-m` flag to perform mock migrations:
-
-```sh
-go run cmd/server/main.go -m
-```
-
-<!-- Message queue docker set up here -->
-
 The storage server expects to store and serve images from `./storage`. You must create this folder, from the root run:
 
 ```sh

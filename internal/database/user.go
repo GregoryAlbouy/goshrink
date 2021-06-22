@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+
 	"github.com/GregoryAlbouy/shrinker/internal"
 	"github.com/jmoiron/sqlx"
 )
@@ -21,16 +23,32 @@ func NewUserService(db *DB) internal.UserService {
 
 // FindByID retrieves a user by its ID.
 func (s *userService) FindByID(userID int) (internal.User, error) {
+	return s.find("id", userID)
+}
+
+// FindOne retrieves a user by its username.
+func (s *userService) FindByUsername(username string) (internal.User, error) {
+	return s.find("username", username)
+}
+
+func (s *userService) find(col string, val interface{}) (internal.User, error) {
 	u := internal.User{}
+
+	var acceptableCol = map[string]bool{
+		"username": true,
+		"id":       true,
+	}
+	if _, ok := acceptableCol[col]; !ok {
+		return u, fmt.Errorf("illegal column %s", col)
+	}
 
 	if err := s.db.Get(
 		&u,
-		"SELECT * FROM V_user_avatar WHERE id = ?",
-		userID,
+		fmt.Sprintf("SELECT * FROM V_user_avatar WHERE %s = ?", col),
+		val,
 	); err != nil {
 		return internal.User{}, err
 	}
-
 	return u, nil
 }
 
@@ -73,17 +91,6 @@ func (s *userService) InsertOne(u internal.User) error {
 	// Set avatar URL if they have one
 	if u.AvatarURL != "" {
 		return s.SetAvatarURL(u.ID, u.AvatarURL)
-	}
-
-	return nil
-}
-
-// Migrate inserts the given users in the database.
-func (s *userService) Migrate(users []*internal.User) error {
-	for _, u := range users {
-		if err := s.InsertOne(*u); err != nil {
-			return err
-		}
 	}
 
 	return nil
